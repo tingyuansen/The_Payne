@@ -78,7 +78,7 @@ for i in range(len(wavelength_run)):
     this_scale = wavelength_tmp[i+R_range]/(R_res*2.355) # convert from FWHM to sigma. 
     this_kernel = norm.pdf(this_wl, scale = this_scale)*wl_res
     conv_matrix[i, :] = this_kernel
-conv_sparse = sparsify(conv_matrix)
+conv_sparse = sparsify_matrix(conv_matrix)
 
 def convolve_spectrum(c1):
     '''
