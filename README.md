@@ -15,7 +15,7 @@ The [tutorial](https://github.com/kareemelbadry/binspec/blob/master/tutorial.ipy
 
 ## Citing this code
 * Please cite [El-Badry et. al. 2018a](http://adsabs.harvard.edu/doi/10.1093/mnras/sty240) and [El-Badry et al. 2018b](http://adsabs.harvard.edu/abs/2018MNRAS.473.5043E) when using this code. These papers describe the binary spectral model and its application to APOGEE spectra.
-* Please also cite Ting et al. 2018 (in prep), which describes the single-star spectral model. [This link will be updated following submission, likely in the next month.] 
+* Please also cite [Ting et al. 2018](http://adsabs.harvard.edu/cgi-bin/bib_query?arXiv:1804.01530), which describes the single-star spectral model. 
 * If you use the routines relying on Jo Bovy's [apogee](https://github.com/jobovy/apogee) package to download spectra, please cite [Bovy (2016)](http://adsabs.harvard.edu/cgi-bin/bib_query?arXiv:1510.06745).
 
 ## Authors

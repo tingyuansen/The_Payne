@@ -20,6 +20,7 @@ import numpy as np
 from scipy import sparse
 from scipy.stats import norm
 from scipy import interpolate
+import multiprocessing
 from multiprocessing import Pool
 import utils
 wavelength_template = utils.load_wavelength_array()
