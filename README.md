@@ -1,5 +1,5 @@
-# BinSpec: Self-consistent binary star spectra
-Tools for modeling and fitting the spectra of multiple-star systems. 
+# The Payne
+Tools for emulate spectral models with neural networks. 
 
 ## Installation 
 Clone this repository and add the base path to your PYTHONPATH variable. Or just run code from the base directory. 
@@ -14,23 +14,22 @@ import fitting
 The [tutorial](https://github.com/kareemelbadry/binspec/blob/master/tutorial.ipynb) shows some simple use cases. 
 
 ## Citing this code
-* Please cite [El-Badry et. al. 2018a](http://adsabs.harvard.edu/doi/10.1093/mnras/sty240) and [El-Badry et al. 2018b](http://adsabs.harvard.edu/abs/2018MNRAS.473.5043E) when using this code. These papers describe the binary spectral model and its application to APOGEE spectra.
-* Please also cite [Ting et al. 2018](http://adsabs.harvard.edu/cgi-bin/bib_query?arXiv:1804.01530), which describes the single-star spectral model. 
+* Please cite [Ting et al. 2018](http://adsabs.harvard.edu/cgi-bin/bib_query?arXiv:1804.01530), when using this code. The paper describes the method and its application to APOGEE spectra.
 * If you use the routines relying on Jo Bovy's [apogee](https://github.com/jobovy/apogee) package to download spectra, please cite [Bovy (2016)](http://adsabs.harvard.edu/cgi-bin/bib_query?arXiv:1510.06745).
 
 ## Authors
-* Kareem El-Badry -- kelbadry at berkeley dot edu
-* [Yuan-Sen Ting](http://www.sns.ias.edu/~ting/) 
+* [Yuan-Sen Ting](http://www.sns.ias.edu/~ting/) -- ting at ias dot edu
+* [Kareem El-Badry](http://w.astro.berkeley.edu/~kelbadry/)
 
 ## Dependencies 
 * The spectral model and fitting routines require only Numpy and Scipy.
 * Routines to download and process APOGEE spectra require the [apogee](https://github.com/jobovy/apogee) package developed and maintained by Jo Bovy, and [Astropy](http://www.astropy.org/).
 * Training a new neural network requires [PyTorch](http://pytorch.org/) (no GPUs required).
-* I develop this package in Python 3 using Anaconda. I've tried to maintain compatibility with Python 2.7, but I cannot guarantee that everything will behave as expected in Python 2.7.
+* I develop this package in Python 3 using Anaconda.
 
 ## Licensing
 
-Copyright 2018 by Kareem El-Badry.
+Copyright 2018 by Yuan-Sen Ting and Kareem El-Badry.
 
 In brief, you can use, distribute, and change this package as you please. 
 
