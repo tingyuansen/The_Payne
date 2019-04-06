@@ -1,5 +1,5 @@
 # The Payne
-Tools for emulate spectral models with neural networks. 
+Tools for interpolating spectral models with neural networks. 
 
 ## Installation 
 Clone this repository and add the base path to your PYTHONPATH variable. Or just run code from the base directory. 
