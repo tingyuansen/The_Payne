@@ -8,37 +8,18 @@ def read_in_neural_network(name = 'normalized_spectra'):
     You can read in existing networks from the neural_nets/ directory, or you
     can train your own networks and edit this function to read them in. 
     '''
-    if name == 'normalized_spectra':
-        path = 'neural_nets/NN_normalized_spectra.npz'
-    elif name == 'unnormalized_spectra':
-        path = 'neural_nets/NN_unnormalized_spectra.npz'
-    elif name == 'radius':
-        path = 'neural_nets/NN_radius.npz'
-    elif name == 'Teff2_logg2':
-        path = 'neural_nets/NN_Teff2_logg2.npz'
+
+    path = 'neural_nets/NN_normalized_spectra.npz'
     tmp = np.load(path)
-    
-    # some of the networks we train have one hidden layer; others have two. 
-    # assume the one we're looking for has two; if it doesn't, we won't find 
-    # w_array_2 and b_array_2. 
-    try:
-        w_array_0 = tmp["w_array_0"]
-        w_array_1 = tmp["w_array_1"]
-        w_array_2 = tmp["w_array_2"]
-        b_array_0 = tmp["b_array_0"]
-        b_array_1 = tmp["b_array_1"]
-        b_array_2 = tmp["b_array_2"]
-        x_min = tmp["x_min"]
-        x_max = tmp["x_max"]
-        NN_coeffs = (w_array_0, w_array_1, w_array_2, b_array_0, b_array_1, b_array_2, x_min, x_max)
-    except KeyError:
-        w_array_0 = tmp["w_array_0"]
-        w_array_1 = tmp["w_array_1"]
-        b_array_0 = tmp["b_array_0"]
-        b_array_1 = tmp["b_array_1"]
-        x_min = tmp["x_min"]
-        x_max = tmp["x_max"]
-        NN_coeffs = (w_array_0, w_array_1, b_array_0, b_array_1, x_min, x_max)
+    w_array_0 = tmp["w_array_0"]
+    w_array_1 = tmp["w_array_1"]
+    w_array_2 = tmp["w_array_2"]
+    b_array_0 = tmp["b_array_0"]
+    b_array_1 = tmp["b_array_1"]
+    b_array_2 = tmp["b_array_2"]
+    x_min = tmp["x_min"]
+    x_max = tmp["x_max"]
+    NN_coeffs = (w_array_0, w_array_1, w_array_2, b_array_0, b_array_1, b_array_2, x_min, x_max)
     tmp.close()
     return NN_coeffs
 
@@ -121,14 +102,3 @@ def _fit_cannonpixels(wav, spec, specerr, deg, cont_pixels):
     chpoly = np.polynomial.Chebyshev.fit(wav[cont_pixels], spec[cont_pixels],
                 deg, w=1./specerr[cont_pixels])
     return chpoly(wav)
-
-def get_chi2_difference(norm_spec, spec_err, norm_model_A, norm_model_B):
-    '''
-    for model comparison. Returns chi2_modelA - chi2_modelB.
-    norm_model_A & B are normalized spectra predicted by two different models. 
-    So e.g., if model A is more simple than model B (say, a single-star 
-        vs a binary model), one would expect this to be positive. 
-    '''
-    chi2_A = np.sum((norm_spec - norm_model_A)**2/spec_err**2)
-    chi2_B = np.sum((norm_spec - norm_model_B)**2/spec_err**2)
-    return chi2_A - chi2_B
