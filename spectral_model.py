@@ -15,14 +15,13 @@ def sigmoid(z):
     '''
     return 1.0/(1.0 + np.exp(-z))
     
-def get_spectrum_from_neural_net(labels, NN_coeffs, normalized = False):
+def get_spectrum_from_neural_net(labels, NN_coeffs):
     '''
     Predict the rest-frame spectrum (normalized) of a single star. 
     '''
     
     # assuming your NN has two hidden layers. 
     w_array_0, w_array_1, w_array_2, b_array_0, b_array_1, b_array_2, x_min, x_max = NN_coeffs
-    scaled_labels = (labels - x_min)/(x_max - x_min) - 0.5
     
     # this is just efficient matrix multiplication. quite a bit faster than np.dot()
     inside = np.einsum('ijk,k->ij', w_array_0, scaled_labels) + b_array_0
