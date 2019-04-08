@@ -42,7 +42,7 @@ def load_apogee_mask():
     tmp = np.load(path)
     mask = tmp['apogee_mask']
     tmp.close()
-    return wavelength
+    return mask
 
 def load_cannon_contpixels():
     '''
