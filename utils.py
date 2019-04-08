@@ -63,17 +63,6 @@ def load_cannon_contpixels():
     tmp.close()
     return pixels_cannon
     
-def load_visit_wavelength():
-    '''
-    Read in the normal wavelength grid (12288 pixels) for visit spectra. Note that
-    this is different from the normal wavelength grid for combined spectra, which 
-    can be read in with spectral_model.load_wavelength_array()
-    '''
-    tmp = np.load('other_data/apogee_visit_wavelength.npz')
-    wave = tmp['wave']
-    tmp.close()
-    return wave
-
 def doppler_shift(wavelength, flux, dv):
     '''
     dv is in km/s
@@ -132,18 +121,6 @@ def _fit_cannonpixels(wav, spec, specerr, deg, cont_pixels):
     chpoly = np.polynomial.Chebyshev.fit(wav[cont_pixels], spec[cont_pixels],
                 deg, w=1./specerr[cont_pixels])
     return chpoly(wav)
-
-def unstitch_model_spectra(model_spec, wavelength):
-    '''
-    for undoing concatenation of spectra from different visits
-    '''
-    all_model_specs = []
-    npix = int(len(wavelength))
-    assert(len(model_spec) % npix == 0)
-    nspec = int(len(model_spec)/npix)
-    for j in range(nspec):
-        all_model_specs.append(model_spec[j*npix:(j+1)*npix])
-    return all_model_specs
 
 def get_chi2_difference(norm_spec, spec_err, norm_model_A, norm_model_B):
     '''
