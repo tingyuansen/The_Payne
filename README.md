@@ -11,7 +11,7 @@ import spectral_model
 import fitting
 ```
 
-The [tutorial](https://github.com/kareemelbadry/binspec/blob/master/tutorial.ipynb) shows some simple use cases. 
+The [tutorial](https://github.com/tingyuansen/The_Payne/blob/master/tutorial.ipynb) shows some simple use cases. 
 
 ## Citing this code
 * Please cite [Ting et al. 2018](http://adsabs.harvard.edu/cgi-bin/bib_query?arXiv:1804.01530), when using this code. The paper describes the method and its application to APOGEE spectra.
