@@ -7,9 +7,10 @@ import utils
 # read in the default wavelength array and the list of pixels used for fitting
 wavelength = utils.load_wavelength_array()
 cont_pixels = utils.load_cannon_contpixels()
+mask = utils.load_apogee_mask()
 
 def fit_normalized_spectrum_single_star_model(norm_spec, spec_err,
-                                              NN_coeffs, p0 = None, num_labels=26):
+                                              NN_coeffs, p0 = None, mask_on=True, num_labels=26):
     '''
     fit a single-star model to a single combined spectrum
     
@@ -34,6 +35,10 @@ def fit_normalized_spectrum_single_star_model(norm_spec, spec_err,
     '''
     tol = 5e-4 # tolerance for when the optimizer should stop optimizing.
 
+    # set infinity uncertainty to pixels that we want to omit
+    if mask_on:
+        spec_err[mask] = 999.
+        
     # assuming your NN has two hidden layers. 
     w_array_0, w_array_1, w_array_2, b_array_0, b_array_1, b_array_2, x_min, x_max = NN_coeffs
     
@@ -47,7 +52,7 @@ def fit_normalized_spectrum_single_star_model(norm_spec, spec_err,
     if p0 is None:
         p0_test = np.zeros(num_labels)
         
-    # don't allow the minimimizer outside the training set (in the scaled label space)
+    # don't allow the minimimizer to go  outside the range of training set
     bounds = np.zeros((num_labels,2))
     bounds[:,0] = -0.5
     bounds[:,1] = 0.5
@@ -60,5 +65,6 @@ def fit_normalized_spectrum_single_star_model(norm_spec, spec_err,
     model_spec = fit_func([], *popt)
 
     # rescale the results back to normal unit
-    result = (popt+0.5)*(x_max-x_min) + x_min
-    return result, model_spec
+    popt[:-1] = (popt[:-1]+0.5)*(x_max-x_min) + x_min
+    pcov[:-1,:-1] = pcov[:-1,:-1]*(x_max-x_min)
+    return popt, pconv, model_spec

@@ -4,8 +4,6 @@ This uses Jo Bovy's APOGEE package to read in spectra: https://github.com/jobovy
 Any way that you can get your hands on the spectra should be fine, as long as you 
 (a) set the uncertainties high in bad pixels, (b) normalize them using the 
 spectral_model.get_apogee_continuum() function, and (c) set a max S/N of 200
-
-I've only used it for spectra from DR14, DR16
 '''
 
 from __future__ import absolute_import, division, print_function # python2 compatibility
@@ -81,14 +79,14 @@ def get_combined_spectrum_single_object(apogee_id, catalog = None, save_local = 
         specerr = temp2[_COMBINED_INDEX]
         mask = temp3[_COMBINED_INDEX]
 
-    # Inflate uncertainties for bad pixels    
+    # inflate uncertainties for bad pixels    
     specerr[(mask & (badcombpixmask)) != 0] += 100*np.mean(spec[np.isfinite(spec)])
 
-    # Inflate pixels with high SNR to 0.5
+    # inflate pixels with high SNR to 0.5
     highsnr = spec/specerr > 200.
     specerr[highsnr] = 0.005*np.fabs(spec[highsnr])
 
-    # Continuum-normalize
+    # continuum-normalize
     cont = utils.get_apogee_continuum(wavelength = wavelength, spec = spec, 
         spec_err = specerr, cont_pixels = cont_pixels)
     spec /= cont

@@ -2,7 +2,7 @@
 from __future__ import absolute_import, division, print_function # python2 compatibility
 import numpy as np
 
-def read_in_neural_network(name = 'normalized_spectra'):
+def read_in_neural_network():
     '''
     read in the weights and biases parameterizing a particular neural network. 
     You can read in existing networks from the neural_nets/ directory, or you
@@ -32,7 +32,18 @@ def load_wavelength_array():
     wavelength = tmp['wavelength']
     tmp.close()
     return wavelength
-    
+
+def load_apogee_mask():
+    '''
+    read in the pixel mask with which we will omit bad pixels during spectral fitting
+    The mask is made by comparing the tuned Kurucz models to the observed spectra from Arcturus and the Sun from APOGEE. We mask out pixels that show more than 2% of deviations.
+    '''
+    path = 'other_data/apogee_mask.npz'
+    tmp = np.load(path)
+    mask = tmp['apogee_mask']
+    tmp.close()
+    return wavelength
+
 def load_cannon_contpixels():
     '''
     read in the default list of APOGEE pixels to use for continuum fitting. 
