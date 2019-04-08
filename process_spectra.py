@@ -4,6 +4,8 @@ This uses Jo Bovy's APOGEE package to read in spectra: https://github.com/jobovy
 Any way that you can get your hands on the spectra should be fine, as long as you 
 (a) set the uncertainties high in bad pixels, (b) normalize them using the 
 spectral_model.get_apogee_continuum() function, and (c) set a max S/N of 200
+
+Here we adopt the the DR12/13 reduction of APOGEE (v6.2). Edit os.environs below for a later version of the APOGEE data release.
 '''
 
 from __future__ import absolute_import, division, print_function # python2 compatibility
@@ -12,6 +14,10 @@ import sys
 import os
 import utils
 import spectral_model
+
+os.environ["SDSS_LOCAL_SAS_MIRROR"] = "data.sdss3.org/sas/"
+os.environ["RESULTS_VERS"] = "v603"
+os.environ["APOGEE_APOKASC_REDUX"] = "v6.2a"
 
 import apogee.tools.read as apread
 from apogee.tools import bitmask
@@ -28,16 +34,7 @@ def read_apogee_catalog():
     all_star_catalog = apread.allStar(rmcommissioning = False, rmdups = False, 
         main = False, raw = True)
     
-    # and match to allVisit for the fibers that each star was observed in
-    allvdata = apread.allVisit(raw = True)
-    fibers = np.zeros((len(all_star_catalog), 
-        np.nanmax(all_star_catalog['NVISITS'])), dtype='int') - 1
-    
-    for ii in range(len(all_star_catalog)):
-        for jj in range(all_star_catalog['NVISITS'][ii]):
-            fibers[ii, jj] = allvdata[all_star_catalog['VISIT_PK'][ii][jj]]['FIBERID']
-
-    return all_star_catalog, fibers
+    return all_star_catalog
 
 def get_combined_spectrum_single_object(apogee_id, catalog = None, save_local = False):
     '''
@@ -47,7 +44,7 @@ def get_combined_spectrum_single_object(apogee_id, catalog = None, save_local = 
     '''
     # read in the allStar catalog if you haven't already
     if catalog is None:
-        catalog, fibers = read_apogee_catalog()
+        catalog = read_apogee_catalog()
         
     # Set up bad pixel mask
     badcombpixmask = bitmask.badpixmask() + 2**bitmask.apogee_pixmask_int("SIG_SKYLINE")

@@ -3,14 +3,15 @@ from __future__ import absolute_import, division, print_function # python2 compa
 import numpy as np
 import spectral_model
 import utils
-    
+from scipy.optimize import curve_fit
+
 # read in the default wavelength array and the list of pixels used for fitting
 wavelength = utils.load_wavelength_array()
 cont_pixels = utils.load_cannon_contpixels()
 mask = utils.load_apogee_mask()
 
 def fit_normalized_spectrum_single_star_model(norm_spec, spec_err,
-                                              NN_coeffs, p0 = None, mask_on=True, num_labels=26):
+                                             NN_coeffs, p0 = None, mask_on=True, num_labels=26):
     '''
     fit a single-star model to a single combined spectrum
     
@@ -43,22 +44,22 @@ def fit_normalized_spectrum_single_star_model(norm_spec, spec_err,
     w_array_0, w_array_1, w_array_2, b_array_0, b_array_1, b_array_2, x_min, x_max = NN_coeffs
     
     def fit_func(dummy_variable, *labels):
-        norm_spec = spectral_model.get_normalized_spectrum_single_star(labels = labels[:-1], 
+        norm_spec = spectral_model.get_spectrum_from_neural_net(scaled_labels = labels[:-1], 
             NN_coeffs = NN_coeffs)
-        norm_spec = doppler_shift(wavelength, norm_spec, labels[-1])
+        norm_spec = utils.doppler_shift(wavelength, norm_spec, labels[-1])
         return norm_spec
     
     # if no initial guess is supplied (in the scaled label space)
     if p0 is None:
-        p0_test = np.zeros(num_labels)
+        p0 = np.zeros(num_labels)
         
     # don't allow the minimimizer to go  outside the range of training set
-    bounds = np.zeros((num_labels,2))
-    bounds[:,0] = -0.5
-    bounds[:,1] = 0.5
-    bounds[-1,0] = -5.
-    bounds[-1,1] = 5.
-    
+    bounds = np.zeros((2,num_labels))
+    bounds[0,:] = -0.5
+    bounds[1,:] = 0.5
+    bounds[0,-1] = -5.
+    bounds[1,-1] = 5.
+
     # run the optimizer
     popt, pcov = curve_fit(fit_func, xdata=[], ydata = norm_spec, sigma = spec_err, p0 = p0,
                 bounds = bounds, ftol = tol, xtol = tol, absolute_sigma = True, method = 'trf')
@@ -67,4 +68,4 @@ def fit_normalized_spectrum_single_star_model(norm_spec, spec_err,
     # rescale the results back to normal unit
     popt[:-1] = (popt[:-1]+0.5)*(x_max-x_min) + x_min
     pcov[:-1,:-1] = pcov[:-1,:-1]*(x_max-x_min)
-    return popt, pconv, model_spec
+    return popt, pcov, model_spec
