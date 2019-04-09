@@ -13,25 +13,23 @@ This file is used to train the neural networks that predict the spectrum at
 each wavelength pixel. Because we need to train a separate network for each 
 pixel (7000+ networks in total), it's most efficient to run this on a cluster
 and train many networks simultaneously. It's pretty fast, though. For the 
-default network here, everything can be run a single 24-core node in something
-like 8 hours. 
+default network here, for a 5D stellar label, everything can be run a single 
+24-core node in something like 8 hours, for 25D stellar label, it might take
+a day or so.
 
 The SBATCH commands above work on the specific cluster I use, but they'll likely 
 have to be adjusted a bit for other clusters/scheduling protocols. 
 
 Because this trains pixels in batches of size pixel_batch_size, it will produce
-a bunch of files NN_apogee_data_driven_norm_i.npz, where i = num_start ... num_end. 
+a bunch of files NN_apogee_i.npz, where i = num_start ... num_end. 
 Afterward, you'll combine these into a single set of NN weights and biases that
 describe the whole spectrum. 
 
-Note that we separately train one (data-driven) NN for normalized spectra, and 
-    a second one for unnormalized spectra. This needs to be run for each of them.
-
-The spectra in the training set are either normal APOGEE combined spectra, normalized
-using utils.get_apogee_continuum(), or synthetic spectra that have been convolved
-to the appropriate R (~22500 for APOGEE). In the former case, we need to mask bad 
-pixels (and pixels with low S/N) in the training set spectra. This is done by setting
-their values to np.nan; such pixels are ignored. 
+The spectra in the training set are either normal APOGEE combined spectra (data-driven),
+normalized using utils.get_apogee_continuum(), or synthetic spectra that have been 
+convolved to the appropriate R (~22500 for APOGEE) with the APOGEE LSF. In the former 
+case, we might need to mask bad pixels (and pixels with low S/N) in the training set 
+spectra. This is done by setting their values to np.nan; such pixels are ignored. 
 '''
 from __future__ import absolute_import, division, print_function # python2 compatibility
 import numpy as np
@@ -50,16 +48,6 @@ num_start, num_end = 0, 36
 
 # path on cluster to training set. 
 training_set_path = '/home/some_directory/training_set.npz'
-
-# if you're training on synthetic spectra for which the typical normalization 
-# very different from one, set is_flux = True and choose mult_factor such that
-# mult_factor*f_lambda ~ 1 for an average spectrum. Note that if you change this,
-# you'll have to change spectral_model.get_spectrum_from_neural_net()
-is_flux = False
-if is_flux:
-    mult_factor = 1e6
-else:
-    mult_factor = 1
 
 # size of training set. Anything over a few 100 should be OK for a small network
 # (see YST's paper), but it can't hurt to go larger if the training set is available. 
@@ -82,6 +70,7 @@ os.environ['OMP_NUM_THREADS']='{:d}'.format(1)
 
 for num_go in range(num_start, num_end + 1):    
     print('starting batch %d' % num_go)
+    
     #==============================================================================
     # restore training spectra
     temp = np.load(training_set_path)
@@ -97,7 +86,6 @@ for num_go in range(num_start, num_end + 1):
     if not len(y):
         continue
         
-    y *= mult_factor
     num_pix = len(y[0])
     
     # loop over all pixels
@@ -114,22 +102,20 @@ for num_go in range(num_start, num_end + 1):
 
         # dimension of the input
         dim_in = this_x.shape[1]
-        
+
         # define neural network
         model = torch.nn.Sequential(
-            torch.nn.Linear(in_features = dim_in, out_features = 5),
+            torch.nn.Linear(dim_in, 10),
             torch.nn.Sigmoid(),
-            torch.nn.Linear(in_features = 5, out_features = 1))
-            
-        loss_fn = torch.nn.L1Loss(size_average = True)
+            torch.nn.Linear(10, 1),
+            torch.nn.Sigmoid(),
+            torch.nn.Linear(1,1)
+        )
+
+        # assume L2 loss, can also switch to L1Loss 
+        loss_fn = torch.nn.MSELoss(size_average = True)
+        #loss_fn = torch.nn.L1Loss(size_average = True)
         
-        # if all spectra in the training set have this pixel masked, this 
-        # will stop it from crashing. Obviously, the trained NN for this 
-        # particular pixel would be rubbish.
-        if not len(this_y):
-            this_y = np.array([1, 1])
-            this_x = np.array([[0.1, 0.1, 0.1, 0.1], [0, 0, 0, 0]])
-            
         # make pytorch variables
         xx = Variable(torch.from_numpy(this_x)).type(torch.FloatTensor)
         yy = Variable(torch.from_numpy(this_y), requires_grad = False).type(torch.FloatTensor)
@@ -165,13 +151,17 @@ for num_go in range(num_start, num_end + 1):
     b_array_0 = np.array([net_array[i][1] for i in range(len(net_array))])
     w_array_1 = np.array([net_array[i][2][0] for i in range(len(net_array))])
     b_array_1 = np.array([net_array[i][3][0] for i in range(len(net_array))])
+    w_array_2 = np.array([net_array[i][4][0][0] for i in range(len(net_array))])
+    b_array_2 = np.array([net_array[i][5][0] for i in range(len(net_array))])
 
     # save parameters and remember how we scaled the labels
-    np.savez("NN_apogee_data_driven_norm_i" + str(num_go) + ".npz",
+    np.savez("NN_apogee_i" + str(num_go) + ".npz",
              w_array_0 = w_array_0,
              w_array_1 = w_array_1,
+             w_array_2 = w_array_2,
              b_array_0 = b_array_0,
              b_array_1 = b_array_1,
+             b_array_2 = b_array_2,
              x_max = x_max,
              x_min = x_min)
     pool.close()
