@@ -1,6 +1,7 @@
 # a few low-level functions that are used throughout
 from __future__ import absolute_import, division, print_function # python2 compatibility
 import numpy as np
+import os
 
 def read_in_neural_network():
     '''
@@ -9,7 +10,7 @@ def read_in_neural_network():
     can train your own networks and edit this function to read them in. 
     '''
 
-    path = 'neural_nets/NN_normalized_spectra.npz'
+    path = os.path.join(os.path.dirname(os.path.realpath(__file__)),'neural_nets/NN_normalized_spectra.npz')
     tmp = np.load(path)
     w_array_0 = tmp["w_array_0"]
     w_array_1 = tmp["w_array_1"]
@@ -27,7 +28,7 @@ def load_wavelength_array():
     '''
     read in the default wavelength grid onto which we interpolate all spectra
     '''
-    path = 'other_data/apogee_wavelength.npz'
+    path = os.path.join(os.path.dirname(os.path.realpath(__file__)),'other_data/apogee_wavelength.npz')
     tmp = np.load(path)
     wavelength = tmp['wavelength']
     tmp.close()
@@ -38,7 +39,7 @@ def load_apogee_mask():
     read in the pixel mask with which we will omit bad pixels during spectral fitting
     The mask is made by comparing the tuned Kurucz models to the observed spectra from Arcturus and the Sun from APOGEE. We mask out pixels that show more than 2% of deviations.
     '''
-    path = 'other_data/apogee_mask.npz'
+    path = os.path.join(os.path.dirname(os.path.realpath(__file__)),'other_data/apogee_mask.npz')
     tmp = np.load(path)
     mask = tmp['apogee_mask']
     tmp.close()
@@ -49,7 +50,7 @@ def load_cannon_contpixels():
     read in the default list of APOGEE pixels to use for continuum fitting. 
     These are taken from Melissa Ness' work with the Cannon
     '''
-    path = 'other_data/cannon_cont_pixels_apogee.npz'
+    path = os.path.join(os.path.dirname(os.path.realpath(__file__)),'other_data/cannon_cont_pixels_apogee.npz')
     tmp = np.load(path)
     pixels_cannon = tmp['pixels_cannon']
     tmp.close()
