@@ -2,13 +2,16 @@
 Tools for interpolating spectral models with neural networks. 
 
 ## Installation 
-Clone this repository and add the base path to your PYTHONPATH variable. Or just run code from the base directory. 
+Clone this repository and run code from the base directory.
+```
+python setup.py install
+````
 
 Individual modules are imported separately, e.g:
 ```
-import utils
-import spectral_model
-import fitting
+from The_Payne import utils
+from The_Payne import spectral_model
+from The_Payne import fitting
 ```
 
 The [tutorial](https://github.com/tingyuansen/The_Payne/blob/master/tutorial.ipynb) shows some simple use cases. 
