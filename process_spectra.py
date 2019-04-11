@@ -12,9 +12,8 @@ from __future__ import absolute_import, division, print_function # python2 compa
 import numpy as np
 import sys
 import os
-import utils
-import spectral_model
-import time
+from . import utils
+from . import spectral_model
 
 os.environ["SDSS_LOCAL_SAS_MIRROR"] = "data.sdss3.org/sas/"
 os.environ["RESULTS_VERS"] = "l31c.2" #v603 for DR12, l30e.2 for DR13, l31c.2 for DR14

@@ -1,7 +1,7 @@
 # code for predicting the spectrum of a single star in normalized space. 
 from __future__ import absolute_import, division, print_function # python2 compatibility
 import numpy as np
-import utils
+from . import utils
 
 # read in the default wavelength array and the list of pixels used for fitting
 wavelength = utils.load_wavelength_array()

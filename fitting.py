@@ -1,9 +1,9 @@
 # code for fitting spectra, using the models in spectral_model.py  
 from __future__ import absolute_import, division, print_function # python2 compatibility
 import numpy as np
-import spectral_model
-import utils
 from scipy.optimize import curve_fit
+from . import spectral_model
+from . import utils
 
 # read in the default wavelength array and the list of pixels used for fitting
 wavelength = utils.load_wavelength_array()
