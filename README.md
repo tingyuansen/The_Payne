@@ -7,7 +7,7 @@ Clone this repository and run code from the base directory.
 python setup.py install
 ````
 
-It should install all dependencies, except for Jo Bovy's [apogee](https://github.com/jobovy/apogee). Individual modules are imported separately, e.g:
+It should install all dependencies, except for Jo Bovy's [apogee](https://github.com/jobovy/apogee) package. Individual modules are imported separately, e.g:
 ```
 from The_Payne import utils
 from The_Payne import spectral_model
