@@ -10,5 +10,5 @@ setup(name='The_Payne',
       package_dir = {'The_Payne/': ''},
       packages=[],
       package_data={},
-      dependency_links = [],
-      install_requires=['numpy','scipy','matplotlib'])
+      dependency_links = ['https://github.com/jobovy/apogee/tarball/master#egg=apogee'],
+      install_requires=['numpy','scipy','matplotlib', 'apogee'])

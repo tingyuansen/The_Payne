@@ -53,7 +53,7 @@ def get_combined_spectrum_single_object(apogee_id, catalog = None, save_local = 
     if not len(msk):
         raise ValueError('the desired Apogee ID was not found in the allStar catalog.')
 
-    field = catalog['FIELD'][msk[0]].decode()
+    field = catalog['FIELD'][msk[0]]
     loc_id = catalog['LOCATION_ID'][msk[0]]
         
     if loc_id == 1:
