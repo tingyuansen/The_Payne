@@ -82,7 +82,7 @@ def get_combined_spectrum_single_object(apogee_id, catalog = None, save_local = 
     specerr[choose] = np.max(np.abs(spec))*999.
         
     # continuum-normalize
-    cont = utils.get_apogee_continuum(wavelength = wavelength, spec = spec, 
+    cont = utils.get_apogee_continuum(spec = spec, 
         spec_err = specerr, cont_pixels = cont_pixels)
     spec /= cont
     specerr /= cont

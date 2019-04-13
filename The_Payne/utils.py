@@ -71,7 +71,7 @@ def doppler_shift(wavelength, flux, dv):
     new_flux = np.interp(new_wavelength, wavelength, flux)
     return new_flux
 
-def get_apogee_continuum(wavelength, spec, spec_err = None, cont_pixels = None):
+def get_apogee_continuum(spec, spec_err = None, cont_pixels = None):
     '''
     this is designed to give the same result as the normalization function from 
     Jo Bovy's APOGEE package, but it's much faster. 
@@ -80,6 +80,8 @@ def get_apogee_continuum(wavelength, spec, spec_err = None, cont_pixels = None):
     if cont_pixels is None:
         cont_pixels = load_cannon_contpixels()
     cont = np.empty_like(spec)
+
+    wavelength = load_wavelength_array()
     
     deg = 4
     
