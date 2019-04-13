@@ -5,13 +5,7 @@ from scipy.optimize import curve_fit
 from . import spectral_model
 from . import utils
 
-# read in the default wavelength array and the list of pixels used for fitting
-wavelength = utils.load_wavelength_array()
-cont_pixels = utils.load_cannon_contpixels()
-mask = utils.load_apogee_mask()
-
-def fit_normalized_spectrum_single_star_model(norm_spec, spec_err,
-                                             NN_coeffs, p0 = None, mask_on=True, num_labels=26):
+def fit_normalized_spectrum_single_star_model(norm_spec, spec_err, NN_coeffs, p0 = None):
     '''
     fit a single-star model to a single combined spectrum
     
@@ -26,9 +20,6 @@ def fit_normalized_spectrum_single_star_model(norm_spec, spec_err,
               [Fe/H], [Co/H], [Ni/H], [Cu/H], [Ge/H],\
               C12/C13, Vmacro [km/s], radial velocity
     
-    num_labels = number of stellar labels + 1 (radial velocity)
-        the default is 26 as shown above
-
     returns:
         popt: the best-fit labels
         pcov: the covariance matrix, from which you can get formal fitting uncertainties
@@ -37,11 +28,13 @@ def fit_normalized_spectrum_single_star_model(norm_spec, spec_err,
     tol = 5e-4 # tolerance for when the optimizer should stop optimizing.
 
     # set infinity uncertainty to pixels that we want to omit
-    if mask_on:
-        spec_err[mask] = 999.
-        
+    spec_err[mask] = 999.
+
     # assuming your NN has two hidden layers. 
     w_array_0, w_array_1, w_array_2, b_array_0, b_array_1, b_array_2, x_min, x_max = NN_coeffs
+
+    # number of labels + radial velocity
+    num_labels = w_array_0.shape[-1] + 1
     
     def fit_func(dummy_variable, *labels):
         norm_spec = spectral_model.get_spectrum_from_neural_net(scaled_labels = labels[:-1], 

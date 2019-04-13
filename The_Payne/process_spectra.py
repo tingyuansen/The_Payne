@@ -23,8 +23,7 @@ from apogee.tools import toAspcapGrid
 import apogee.tools.read as apread
 
 
-# read in the default wavelength array and the list of pixels used for fitting
-wavelength = utils.load_wavelength_array()
+# read in the list of pixels used for fitting the APOGEE continuum
 cont_pixels = utils.load_cannon_contpixels()
 
 def read_apogee_catalog():

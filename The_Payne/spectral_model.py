@@ -3,10 +3,6 @@ from __future__ import absolute_import, division, print_function # python2 compa
 import numpy as np
 from . import utils
 
-# read in the default wavelength array and the list of pixels used for fitting
-wavelength = utils.load_wavelength_array()
-cont_pixels = utils.load_cannon_contpixels()
-
 def sigmoid(z):
     '''
     This is the activation function used by default in all our neural networks. 
