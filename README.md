@@ -16,6 +16,12 @@ from The_Payne import fitting
 
 The [tutorial](https://github.com/tingyuansen/The_Payne/blob/master/tutorial.ipynb) shows some simple use cases. 
 
+## Dependencies 
+* The spectral model and fitting routines require only Numpy and Scipy.
+* Routines to download and process APOGEE spectra require the [apogee](https://github.com/jobovy/apogee) package developed and maintained by Jo Bovy, and [Astropy](http://www.astropy.org/).
+* Training a new neural network requires [PyTorch](http://pytorch.org/) (GPUs required).
+* I develop this package in Python 3.6 using Anaconda.
+
 ## Citing this code
 * Please cite [Ting et al. 2018](http://adsabs.harvard.edu/cgi-bin/bib_query?arXiv:1804.01530), when using this code. The paper describes the method and its application to APOGEE spectra.
 * If you use the routines relying on Jo Bovy's [apogee](https://github.com/jobovy/apogee) package to download spectra, please cite [Bovy (2016)](http://adsabs.harvard.edu/cgi-bin/bib_query?arXiv:1510.06745).
@@ -23,12 +29,6 @@ The [tutorial](https://github.com/tingyuansen/The_Payne/blob/master/tutorial.ipy
 ## Authors
 * [Yuan-Sen Ting](http://www.sns.ias.edu/~ting/) -- ting at ias dot edu
 * [Kareem El-Badry](http://w.astro.berkeley.edu/~kelbadry/)
-
-## Dependencies 
-* The spectral model and fitting routines require only Numpy and Scipy.
-* Routines to download and process APOGEE spectra require the [apogee](https://github.com/jobovy/apogee) package developed and maintained by Jo Bovy, and [Astropy](http://www.astropy.org/).
-* Training a new neural network requires [PyTorch](http://pytorch.org/) (GPUs required).
-* I develop this package in Python 3.6 using Anaconda.
 
 ## Licensing
 
