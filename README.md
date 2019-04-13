@@ -25,7 +25,7 @@ The [tutorial](https://github.com/tingyuansen/The_Payne/blob/master/tutorial.ipy
 
 ## Licensing
 
-Copyright 2018 by Yuan-Sen Ting and Kareem El-Badry.
+Copyright 2018 by Yuan-Sen Ting.
 
 In brief, you can use, distribute, and change this package as you please. 
 
