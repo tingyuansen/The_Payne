@@ -5,7 +5,7 @@ from scipy.optimize import curve_fit
 from . import spectral_model
 from . import utils
 
-def fit_normalized_spectrum_single_star_model(norm_spec, spec_err, NN_coeffs, p0 = None):
+def fit_normalized_spectrum_single_star_model(norm_spec, spec_err, NN_coeffs, mask, p0 = None):
     '''
     fit a single-star model to a single combined spectrum
     
