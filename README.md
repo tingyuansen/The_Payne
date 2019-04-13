@@ -7,7 +7,7 @@ Clone this repository and run code from the base directory.
 python setup.py install
 ````
 
-It should install all dependencies, except for Jo Bovy's [apogee](https://github.com/jobovy/apogee) package. Individual modules are imported separately, e.g:
+Individual modules can be imported separately, e.g:
 ```
 from The_Payne import utils
 from The_Payne import spectral_model
@@ -27,8 +27,8 @@ The [tutorial](https://github.com/tingyuansen/The_Payne/blob/master/tutorial.ipy
 ## Dependencies 
 * The spectral model and fitting routines require only Numpy and Scipy.
 * Routines to download and process APOGEE spectra require the [apogee](https://github.com/jobovy/apogee) package developed and maintained by Jo Bovy, and [Astropy](http://www.astropy.org/).
-* Training a new neural network requires [PyTorch](http://pytorch.org/) (no GPUs required).
-* I develop this package in Python 3 using Anaconda.
+* Training a new neural network requires [PyTorch](http://pytorch.org/) (GPUs required).
+* I develop this package in Python 3.6 using Anaconda.
 
 ## Licensing
 
