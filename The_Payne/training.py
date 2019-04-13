@@ -1,13 +1,22 @@
 '''
-This file is used to train the neural networks that predict the spectrum given any set of stellar labels (stellar parameters + elemental abundances). 
+This file is used to train the neural networks that predict the spectrum 
+given any set of stellar labels (stellar parameters + elemental abundances). 
 
-Note that, the approach here is slightly different from Ting+18. Instead of training individual small networks for each pixel separately, we train a single large network for all the pixels simultaneously. 
+Note that, the approach here is slightly different from Ting+18. Instead of 
+training individual small networks for each pixel separately, we train a single
+ large network for all the pixels simultaneously. 
 
-The advantage of doing so is that the information in the adjacent pixels could cross talks, and this leads to more precise interpolation of spectral models.
+The advantage of doing so is that the information in the adjacent pixels could 
+cross talks, and this leads to more precise interpolation of spectral models.
 
-However to train a large network as such, GPUs are needed, and this code will only run with GPU. But even for a simple inexpensive GPU (GTX 1060), this code should be pretty fast, and for any normal grid of spectral models with 1000-10000 training spectra, with > 10 labels, it should not take more than a day to train
+However to train a large network as such, GPUs are needed, and this code will 
+only run with GPU. But even for a simple inexpensive GPU (GTX 1060), this code 
+should be pretty fast, and for any normal grid of spectral models with 
+1000-10000 training spectra, with > 10 labels, it should not take more than 
+a day to train
 
-The default training set are synthetic spectra that have been convolved to the appropriate R (~22500 for APOGEE) with the APOGEE LSF.
+The default training set are synthetic spectra that have been convolved to the 
+appropriate R (~22500 for APOGEE) with the APOGEE LSF.
 '''
 
 from __future__ import absolute_import, division, print_function # python2 compatibility
