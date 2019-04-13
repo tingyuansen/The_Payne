@@ -7,13 +7,6 @@ Clone this repository and run code from the base directory.
 python setup.py install
 ````
 
-Individual modules can be imported separately, e.g:
-```
-from The_Payne import utils
-from The_Payne import spectral_model
-from The_Payne import fitting
-```
-
 The [tutorial](https://github.com/tingyuansen/The_Payne/blob/master/tutorial.ipynb) shows some simple use cases. 
 
 ## Dependencies 
