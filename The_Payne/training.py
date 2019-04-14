@@ -31,19 +31,19 @@ dtype = torch.cuda.FloatTensor
 torch.set_default_tensor_type('torch.cuda.FloatTensor')
 
 # path on cluster to training set. 
-training_set_path = '/home/some_directory/training_set.npz'
+training_set_path = 'kurucz_training_spectra.npz'
 
 # size of training set. Anything over a few 100 should be OK for a small network
 # (see YST's paper), but it can't hurt to go larger if the training set is available. 
 n_train = 2000
 
-# how long to train each pixel until convergence. 5e4 is good for the specific NN
+# how long to train each pixel until convergence. 1e5 is good for the specific NN
 # architecture and learning I used by default, but bigger networks take more steps,
 # and decreasing the learning rate will also change this. You can get a sense of 
-# how many steps are needed for a new NN architecture by choosing a pixel at random
-# and plotting the loss function evaluated on both the training set and a validation
+# how many steps are needed for a new NN architecture by
+# plotting the loss function evaluated on both the training set and a validation
 # set as a function of step number. It should plateau once the NN is converged. 
-num_steps_to_converge = 5e4
+num_steps_to_converge = 1e5
 
 # this is also tunable, but 0.001 seems to work well for most use cases. Again, diagnose
 # with a validation set if you change this. 
@@ -53,11 +53,11 @@ learning_rate = 0.001
 temp = np.load(training_set_path)
 x = (temp["labels"].T)[:n_train,:]
 y = temp["spectra"][:n_train,:]
-temp.close()
 
 # and validation spectra
 x_valid = (temp["labels"].T)[n_train:,:]
 y_valid = temp["spectra"][n_train:,:]
+temp.close()
 
 x_max = np.max(x, axis = 0)
 x_min = np.min(x, axis = 0)
@@ -66,6 +66,9 @@ x_valid = (x_valid-x_min)/(x_max-x_min) - 0.5
 
 # dimension of the input
 dim_in = x.shape[1]
+
+# dimension of the output
+num_pixel = y.shape[1]
 
 # define neural network
 model = torch.nn.Sequential(
@@ -78,8 +81,8 @@ model = torch.nn.Sequential(
 model.cuda()
 
 # assume L2 loss, can also switch to L1Loss 
-loss_fn = torch.nn.MSELoss(size_average = True)
-#loss_fn = torch.nn.L1Loss(size_average = True)
+loss_fn = torch.nn.MSELoss(reduction = 'mean')
+#loss_fn = torch.nn.L1Loss(reduction = 'mean')
         
 # make pytorch variables
 x = Variable(torch.from_numpy(x)).type(dtype)
@@ -94,11 +97,13 @@ optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay 
 # train the neural network
 t = 0
 current_loss = np.inf
+loss_array =[]
+loss_valid_array = []
 while t < num_steps_to_converge:
     y_pred = model(x)
-    loss = loss_fn(y_pred, y)
+    loss = loss_fn(y_pred, y)*1e4
     y_pred_valid = model(x_valid)
-    loss_valid = loss_fn(y_pred, y_valid)
+    loss_valid = loss_fn(y_pred_valid, y_valid)*1e4
     
     optimizer.zero_grad()
     loss.backward()
@@ -107,17 +112,21 @@ while t < num_steps_to_converge:
 
     # print loss function to monitor
     if t % 1000 == 0:
-        print('Step ' + str(t) + ': Training set loss = ' + loss \
-              + ' / Validation set loss = ' + loss_valid)
-
-    # return best-fit weights and biases
-    model_numpy = []
-    for param in model.parameters():
-        model_numpy.append(param.data.cpu().numpy())
-                
-
-
-
+        loss_data = loss.data.item()
+        loss_valid_data = loss_valid.data.item()
+        loss_array.append(loss_data)
+        loss_valid_array.append(loss_valid_data)
+        print('Step ' + str(t) \
+        + ': Training set loss = ' + str(int(loss_data*1000.)/1000.) \
+        + ' / Validation set loss = ' + str(int(loss_valid_data*1000.)/1000.))
+ 
+        # record the weights and biases if the validation set loss improves
+        if loss_valid_data < current_loss:
+            current_loss = loss_valid
+            model_numpy = []
+            for param in model.parameters():
+                model_numpy.append(param.data.cpu().numpy())
+ 
 # extract the weights and biases
 w_array_0 = model_numpy[0]
 b_array_0 = model_numpy[1]
@@ -135,4 +144,6 @@ np.savez("NN_normalized_spectra.npz",\
          b_array_1 = b_array_1,\
          b_array_2 = b_array_2,\
          x_max=x_max,\
-         x_min=x_min)
+         x_min=x_min,\
+         loss_valid_array = loss_valid_array,\
+         loss_array = loss_array)
