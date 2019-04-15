@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='The_Payne',
-      version='0.1',
+      version='1.0',
       description='Tools for interpolating spectral models with neural networks.',
       author='Yuan-Sen Ting',
       author_email='ting@ias.edu',

@@ -67,12 +67,12 @@ def load_training_data():
     '''
     path = os.path.join(os.path.dirname(os.path.realpath(__file__)),'other_data/kurucz_training_spectra.npz')
     tmp = np.load(path)
-    training_labels = (temp["labels"].T)[:1000,:]
-    training_spectra = temp["spectra"][:1000,:]
-    validation_labels = (temp["labels"].T)[1000:,:]
-    validation_spectra = temp["spectra"][1000:,:]
+    training_labels = (tmp["labels"].T)[:1000,:]
+    training_spectra = tmp["spectra"][:1000,:]
+    validation_labels = (tmp["labels"].T)[1000:,:]
+    validation_spectra = tmp["spectra"][1000:,:]
     tmp.close()
-    return training_labels. training_spectra, validation_labels, validation_spectra
+    return training_labels, training_spectra, validation_labels, validation_spectra
 
 def doppler_shift(wavelength, flux, dv):
     '''
