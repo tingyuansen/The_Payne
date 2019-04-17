@@ -113,7 +113,7 @@ def get_combined_spectrum_single_object(apogee_id, catalog = None, save_local = 
     specerr /= cont
     
     if save_local:
-        np.savez('spectra/combined/spectrum_ap_id_' + str(apogee_id.decode()) + '_.npz',
+        np.savez(download_path + 'spectrum_ap_id_' + str(apogee_id) + '_.npz',
                  spectrum = spec, spec_err = specerr)
     return spec, specerr
     
