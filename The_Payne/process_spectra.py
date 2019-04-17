@@ -12,15 +12,25 @@ from __future__ import absolute_import, division, print_function # python2 compa
 import numpy as np
 import sys
 import os
+import subprocess
+import astropy.io.fits as pyfits
+    
 from . import utils
 from . import spectral_model
+
+# dr14
+master_path = "data.sdss3.org/sas/dr14/apogee/spectro/redux/r8/stars/" 
+catalog_path = "l31c/l31c.2/"
+catalog_name = "allStar-l31c.2.fits"
+
+# download path
+download_path = "apogee_download/"
 
 os.environ["SDSS_LOCAL_SAS_MIRROR"] = "data.sdss3.org/sas/"
 os.environ["RESULTS_VERS"] = "l31c.2" #v603 for DR12, l30e.2 for DR13, l31c.2 for DR14
 os.environ["APOGEE_APOKASC_REDUX"] = "v6.2a"
 
 from apogee.tools import toAspcapGrid
-import apogee.tools.read as apread
 
 
 # read in the list of pixels used for fitting the APOGEE continuum
@@ -30,10 +40,21 @@ def read_apogee_catalog():
     '''
     read in the catalog of info for all stars in a data release. 
     '''
-    all_star_catalog = apread.allStar(rmcommissioning = False, rmdups = False, 
-        main = False, raw = True)
+    filepath = os.path.join(master_path, catalog_path, catalog_name)  # dr14
+    filename = os.path.join(download_path, catalog_name)
+    
+    #try:
+    print(download_path)
+    os.makedirs(os.path.dirname(download_path))
+    #except OSError: pass
+    if not os.path.exists(filename):
+        subprocess.check_call(["wget", filepath, "-O", "%s"%filename])
+
+    all_star_catalog = pyfits.getdata(filename)
     catalog_id = all_star_catalog['APOGEE_ID'].astype("str")
     return all_star_catalog, catalog_id
+
+
 
 def get_combined_spectrum_single_object(apogee_id, catalog = None, save_local = False):
     '''
@@ -54,16 +75,24 @@ def get_combined_spectrum_single_object(apogee_id, catalog = None, save_local = 
 
     field = catalog['FIELD'][msk[0]]
     loc_id = catalog['LOCATION_ID'][msk[0]]
-        
-    if loc_id == 1:
-        temp1 = apread.apStar(field, apogee_id, ext = 1, header = False, aspcapWavegrid = False)
-        temp2 = apread.apStar(field, apogee_id, ext = 2, header = False, aspcapWavegrid = False)
-        temp3 = apread.apStar(field, apogee_id, ext = 3, header = False, aspcapWavegrid = False)
-    else:
-        temp1 = apread.apStar(loc_id, apogee_id, ext = 1, header = False, aspcapWavegrid = False)
-        temp2 = apread.apStar(loc_id, apogee_id, ext = 2, header = False, aspcapWavegrid = False)
-        temp3 = apread.apStar(loc_id, apogee_id, ext = 3, header = False, aspcapWavegrid = False)
 
+    filename = 'apStar-r8-%s.fits' % apogee_id.strip()
+    if loc_id == 1:
+        filepath = os.path.join(master_path,'apo1m', field.strip(), filename)
+    else:
+        filepath = os.path.join(master_path,'apo25m', '%i' % loc_id, filename)
+    filename = os.path.join(download_path, filename)
+    
+    try:
+        os.makedirs(os.path.dirname(download_path))
+    except OSError: pass
+    if not os.path.exists(filename):
+        subprocess.check_call(["wget", filepath, '-O', '%s'%filename])
+
+    temp1 = pyfits.getdata(filename, ext = 1, header = False)
+    temp2 = pyfits.getdata(filename, ext = 1, header = False)
+    temp3 = pyfits.getdata(filename, ext = 1, header = False)
+    
     if temp1.shape[0] > 6000:
         spec = temp1
         specerr = temp2
