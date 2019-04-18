@@ -65,7 +65,7 @@ def training(training_labels, training_spectra, validating_labels, validation_sp
     returns:
         training loss and validation loss (per 1000 steps)
         the codes also outputs a numpy saved array ""NN_normalized_spectra.npz" 
-        whichcan be imported and substitute the default neural networks (see tutorial)
+        which can be imported and substitute the default neural networks (see tutorial)
     '''
     
     # run on cuda
