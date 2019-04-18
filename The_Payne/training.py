@@ -160,4 +160,4 @@ def training(training_labels, training_spectra, validating_labels, validation_sp
              training_loss = training_loss,\
              validation_loss = validation_loss)
 
-    return training loss, validation_loss
+    return training_loss, validation_loss
