@@ -26,7 +26,7 @@ import os
 import torch
 from torch.autograd import Variable
 
-def training(training_labels, training_spectra, validating_labels, validation_spectra,\
+def training(training_labels, training_spectra, validation_labels, validation_spectra,\
              num_neurons = 300, num_steps=1e5, learning_rate=0.001):
 
     '''
