@@ -60,17 +60,17 @@ def load_training_data():
     '''
     read in the default Kurucz training spectra for APOGEE
 
-    Here we only consider 1000 training spectra and 500 validation spectra
+    Here we only consider 800 training spectra and 200 validation spectra
     for the tutorial (due to the GitHub upload limit); in practice, more
     training spectra will be better. The default neural networks included were
     trained using 10000 training spectra.
     '''
     path = os.path.join(os.path.dirname(os.path.realpath(__file__)),'other_data/kurucz_training_spectra.npz')
     tmp = np.load(path)
-    training_labels = (tmp["labels"].T)[:1000,:]
-    training_spectra = tmp["spectra"][:1000,:]
-    validation_labels = (tmp["labels"].T)[1000:,:]
-    validation_spectra = tmp["spectra"][1000:,:]
+    training_labels = (tmp["labels"].T)[:800,:]
+    training_spectra = tmp["spectra"][:800,:]
+    validation_labels = (tmp["labels"].T)[800:,:]
+    validation_spectra = tmp["spectra"][800:,:]
     tmp.close()
     return training_labels, training_spectra, validation_labels, validation_spectra
 
