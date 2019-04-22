@@ -1,6 +1,5 @@
 '''
 Code for reading in combined spectra.
-This uses Jo Bovy's APOGEE package to read in spectra: https://github.com/jobovy/apogee
 Any way that you can get your hands on the spectra should be fine, as long as you 
 
 Here we adopt APOGEE DR14. Edit os.environs below for a later version of APOGEE data release.
@@ -121,7 +120,7 @@ def get_combined_spectrum_single_object(apogee_id, catalog = None, save_local = 
 def toAspcapGrid(spec):
     """
     Convert a spectrum from apStar grid to the ASPCAP grid (w/o the detector gaps)
-    Adopted from Jo Bovy's APOGEE package
+    Adapted from Jo Bovy's APOGEE package
     """
     
     apStarBlu_lo,apStarBlu_hi,apStarGre_lo,apStarGre_hi,apStarRed_lo,apStarRed_hi \
