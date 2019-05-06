@@ -96,6 +96,13 @@ def get_combined_spectrum_single_object(apogee_id, catalog = None, save_local = 
         specerr = temp2[_COMBINED_INDEX]
         mask = temp3[_COMBINED_INDEX]
 
+    # Inflate uncertainties for bad pixels    
+    specerr[mask != 0] += 100*np.mean(spec[np.isfinite(spec)])
+
+    # Inflate pixels with high SNR to 0.5
+    highsnr = spec/specerr > 200.
+    specerr[highsnr] = 0.005*np.fabs(spec[highsnr])
+    
     # convert ApStar grid to Aspcap grid
     spec = toAspcapGrid(spec) # dr12 wavelength format
     specerr = toAspcapGrid(specerr)
