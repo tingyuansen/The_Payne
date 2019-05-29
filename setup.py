@@ -11,4 +11,4 @@ setup(name='The_Payne',
       packages=['The_Payne'],
       package_data={'The_Payne':['other_data/*.npz','neural_nets/*.npz']},
       dependency_links = [],
-      install_requires=['torch', 'torchvision'])
+      install_requires=['torch>=1.1', 'torchvision'])
