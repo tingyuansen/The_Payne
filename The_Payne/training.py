@@ -4,19 +4,19 @@ given any set of stellar labels (stellar parameters + elemental abundances).
 
 Note that, the approach here is slightly different from Ting+18. Instead of 
 training individual small networks for each pixel separately, we train a single
- large network for all Pixels simultaneously. 
+large network for all pixels simultaneously. 
 
 The advantage of doing so is that individual pixels could exploit information 
 from the adjacent pixel. This usually leads to more precise interpolations of 
 spectral models.
 
 However to train a large network, GPUs are needed, and this code will 
-only run with GPUs. But even for a simple, inexpensive GPU (GTX 1060), this code 
-should be pretty efficient -- any grid of spectral models with 1000-10000 
-training spectra, with > 10 labels, it should not take more than a day to train
+only run with GPUs. But even for a simple, inexpensive, GPU (GTX 1060), this code 
+should be pretty efficient -- for any grid of spectral models with 1000-10000 
+training spectra and > 10 labels, it should not take more than a day to train
 
 The default training set are synthetic spectra the Kurucz models and have been
- convolved to the appropriate R (~22500 for APOGEE) with the APOGEE LSF.
+convolved to the appropriate R (~22500 for APOGEE) with the APOGEE LSF.
 '''
 
 from __future__ import absolute_import, division, print_function # python2 compatibility
@@ -44,10 +44,10 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
     before the networks start to overfit (gauged by the validation set).
 
     num_neurons = number of neurons per hidden layer in the neural networks. 
-    We assume a 2 hidden-layer neural networks.
-    Increasing this number increases the complexity of the network, which can 
-    capture a more subtle variation of flux as a function of stellar labels, but
-    increasing the complexity could also lead to overfitting. And it is also slower 
+    We assume a 2 hidden-layer neural network.
+    Increasing this number increases the complexity of the network. This could be helpful 
+    in capturing a more subtle variation of flux as a function of stellar labels, but
+    increasing the complexity could also lead to overfitting. It is also slower 
     to train with a larger network.
 
     num_steps = how many steps to train until convergence. 
@@ -56,7 +56,7 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
     also change this. You can get a sense of how many steps are needed for a new 
     NN architecture by plotting the loss function evaluated on both the training set 
     and a validation set as a function of step number. It should plateau once the NN 
-    is converged.  
+    has converged.  
 
     learning_rate = step size to take for gradient descent
     This is also tunable, but 0.001 seems to work well for most use cases. Again, 
@@ -65,7 +65,7 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
     returns:
         training loss and validation loss (per 1000 steps)
         the codes also outputs a numpy saved array ""NN_normalized_spectra.npz" 
-        which can be imported and substitute the default neural networks (see tutorial)
+        which can be imported and substitutes the default neural networks (see tutorial)
     '''
     
     # run on cuda
