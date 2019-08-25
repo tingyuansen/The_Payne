@@ -27,7 +27,7 @@ import torch
 from torch.autograd import Variable
 
 def neural_net(training_labels, training_spectra, validation_labels, validation_spectra,\
-             num_neurons = 300, num_steps=1e4, learning_rate=0.001):
+             num_neurons = 100, num_steps=1e4, learning_rate=1e-4, batch_size=512):
 
     '''
     Training neural networks to emulate spectral models
@@ -61,6 +61,10 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
     learning_rate = step size to take for gradient descent
     This is also tunable, but 0.001 seems to work well for most use cases. Again,
     diagnose with a validation set if you change this.
+
+    batch_size = the batch size for training the neural networks during the stochastic
+    gradient descent. A larger batch_size reduces the stochasticity, but it might also
+    risk to stuck in a local minimum
 
     returns:
         training loss and validation loss (per 1000 steps)
@@ -108,9 +112,6 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay = 0)
 
 #--------------------------------------------------------------------------------------------
-    # batch size
-    batch_size = 512
-
     # break into batches
     nsamples = x.shape[0]
     nbatches = nsamples // batch_size
