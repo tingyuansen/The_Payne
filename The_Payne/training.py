@@ -122,7 +122,7 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
 
 #-------------------------------------------------------------------------------------------------------
     # train the network
-    for e in range(num_steps):
+    for e in range(int(num_steps)):
 
         # randomly permute the data
         perm = torch.randperm(nsamples)
