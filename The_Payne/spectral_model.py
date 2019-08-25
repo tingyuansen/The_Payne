@@ -16,7 +16,7 @@ def get_spectrum_from_neural_net(scaled_labels, NN_coeffs):
     Predict the rest-frame spectrum (normalized) of a single star.
     We input the scaled stellar labels (not in the original unit). Each label ranges from -0.5 to 0.5
     '''
-
+    
     # assuming your NN has two hidden layers.
     w_array_0, w_array_1, w_array_2, b_array_0, b_array_1, b_array_2, x_min, x_max = NN_coeffs
 
