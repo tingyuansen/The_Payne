@@ -142,8 +142,8 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
         if e % 10 == 0:
             y_pred_valid = model(x_valid)
             loss_valid = loss_fn(y_pred_valid, y_valid)*1e4
-            print('iter %s:' % e, 'training loss = %.3f' % loss*1000.,\
-                 'validation loss = %.3f' % loss_valid*1000.)
+            print('iter %s:' % e, 'training loss = %.3f' % loss,\
+                 'validation loss = %.3f' % loss_valid)
 
             loss_data = loss.data.item()
             loss_valid_data = loss_valid.data.item()
