@@ -27,7 +27,7 @@ import torch
 from torch.autograd import Variable
 
 def neural_net(training_labels, training_spectra, validation_labels, validation_spectra,\
-             num_neurons = 300, num_steps=1e3, learning_rate=0.001):
+             num_neurons = 300, num_steps=1e4, learning_rate=0.001):
 
     '''
     Training neural networks to emulate spectral models
