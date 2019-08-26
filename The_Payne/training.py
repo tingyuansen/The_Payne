@@ -25,9 +25,10 @@ import sys
 import os
 import torch
 from torch.autograd import Variable
+from . import radam
 
 def neural_net(training_labels, training_spectra, validation_labels, validation_spectra,\
-             num_neurons = 100, num_steps=1e4, learning_rate=1e-4, batch_size=512):
+             num_neurons = 300, num_steps=1e4, learning_rate=1e-3, batch_size=512):
 
     '''
     Training neural networks to emulate spectral models
@@ -109,7 +110,8 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
     y_valid = Variable(torch.from_numpy(validation_spectra), requires_grad=False).type(dtype)
 
     # weight_decay is for regularization. Not required, but one can play with it.
-    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay = 0)
+    #optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay = 0)
+    optimizer = radam.RAdam(model.parameters(), lr=learning_rate, weight_decay = 0)
 
 #--------------------------------------------------------------------------------------------
     # break into batches
