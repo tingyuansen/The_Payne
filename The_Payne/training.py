@@ -184,7 +184,7 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
                      training_loss = training_loss,\
                      validation_loss = validation_loss)
 
-            torch.save(flow, 'flow_final_steps=%s' %e + '.pt')
+            torch.save(model, 'model_final_steps=%s' %e + '.pt')
 
 
 #--------------------------------------------------------------------------------------------
