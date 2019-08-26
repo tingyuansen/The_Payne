@@ -110,9 +110,9 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
     y_valid = Variable(torch.from_numpy(validation_spectra), requires_grad=False).type(dtype)
 
     # weight_decay is for regularization. Not required, but one can play with it.
-    #optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay = 0)
-    print('optimized with rectified Adam')
-    optimizer = radam.RAdam(model.parameters(), lr=learning_rate, weight_decay = 0)
+    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay = 0)
+    #print('optimized with rectified Adam')
+    #optimizer = radam.RAdam(model.parameters(), lr=learning_rate, weight_decay = 0)
 
 #--------------------------------------------------------------------------------------------
     # break into batches
@@ -137,7 +137,8 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
         for i in range(nbatches):
             idx = perm[i * batch_size : (i+1) * batch_size]
             y_pred = model(x[idx])
-            loss = loss_fn(y_pred, y[idx])*1e4
+            #loss = loss_fn(y_pred, y[idx])*1e4
+            loss = (y_pred-y[idx]).abs().pow(1./2.)*1e4
             optimizer.zero_grad()
             loss.backward(retain_graph=True)
             optimizer.step()
@@ -145,7 +146,8 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
         # the average loss.
         if e % 10 == 0:
             y_pred_valid = model(x_valid)
-            loss_valid = loss_fn(y_pred_valid, y_valid)*1e4
+            #loss_valid = loss_fn(y_pred_valid, y_valid)*1e4
+            loss_valid = (y_pred_valid-y_valid).abs().pow(1./2.)*1e4
             print('iter %s:' % e, 'training loss = %.3f' % loss,\
                  'validation loss = %.3f' % loss_valid)
 
