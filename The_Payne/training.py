@@ -111,6 +111,7 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
 
     # weight_decay is for regularization. Not required, but one can play with it.
     #optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay = 0)
+    print('optimized with rectified Adam')
     optimizer = radam.RAdam(model.parameters(), lr=learning_rate, weight_decay = 0)
 
 #--------------------------------------------------------------------------------------------
