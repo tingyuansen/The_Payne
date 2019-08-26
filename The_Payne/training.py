@@ -101,7 +101,7 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
     model.cuda()
 
     # assume L2 loss
-    loss_fn = torch.nn.MSELoss(reduction = 'mean')
+    loss_fn = torch.nn.L1Loss(reduction = 'mean')
 
     # make pytorch variables
     x = Variable(torch.from_numpy(x)).type(dtype)
