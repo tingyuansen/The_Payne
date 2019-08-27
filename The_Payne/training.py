@@ -110,8 +110,6 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
     y_valid = Variable(torch.from_numpy(validation_spectra), requires_grad=False).type(dtype)
 
     # weight_decay is for regularization. Not required, but one can play with it.
-    #optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay = 0)
-    print('optimized with rectified Adam')
     optimizer = radam.RAdam(model.parameters(), lr=learning_rate, weight_decay = 0)
 
 #--------------------------------------------------------------------------------------------
@@ -160,32 +158,6 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
                 model_numpy = []
                 for param in model.parameters():
                     model_numpy.append(param.data.cpu().numpy())
-
-#--------------------------------------------------------------------------------------------
-        # save periodically
-        if e % 1e4 == 0:
-            w_array_0 = model_numpy[0]
-            b_array_0 = model_numpy[1]
-            w_array_1 = model_numpy[2]
-            b_array_1 = model_numpy[3]
-            w_array_2 = model_numpy[4]
-            b_array_2 = model_numpy[5]
-
-            # save parameters and remember how we scaled the labels
-            np.savez("NN_normalized_spectra_steps=%s" %e + ".npz",\
-                     w_array_0 = w_array_0,\
-                     w_array_1 = w_array_1,\
-                     w_array_2 = w_array_2,\
-                     b_array_0 = b_array_0,\
-                     b_array_1 = b_array_1,\
-                     b_array_2 = b_array_2,\
-                     x_max=x_max,\
-                     x_min=x_min,\
-                     training_loss = training_loss,\
-                     validation_loss = validation_loss)
-
-            torch.save(model, 'model_final_steps=%s' %e + '.pt')
-
 
 #--------------------------------------------------------------------------------------------
     # extract the weights and biases
