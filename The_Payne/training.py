@@ -93,6 +93,8 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
     # restore the NMF components
     temp = np.load("nmf_components.npz")
     nmf_components = temp["nmf_components"]
+    mu_nmf = temp["mu_Y"]
+    std_nmf = temp["std_Y"]
     num_pixel = nmf_components.shape[0]
 
 #--------------------------------------------------------------------------------------------
@@ -121,6 +123,8 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
 #--------------------------------------------------------------------------------------------
     # make NMF components pytorch variables as well
     nmf_components = Variable(torch.from_numpy(nmf_components), requires_grad=False).type(dtype)
+    mu_nmf = Variable(torch.from_numpy(mu_nmf), requires_grad=False).type(dtype)
+    std_nmf = Variable(torch.from_numpy(std_nmf), requires_grad=False).type(dtype)
 
 #--------------------------------------------------------------------------------------------
     # break into batches
@@ -148,7 +152,8 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
 
             # adopt the nmf representation
             y_nmf = model(x[idx])
-            print(y_nmf)
+            print(y_nmf.shape, std_Y.shape, mu_Y.shape)
+            y_nmf = (y_nmf*std_Y) + mu_Y
             y_pred = torch.mm(y_nmf, nmf_components)
 
             loss = loss_fn(y_pred, y[idx])*1e4
@@ -162,6 +167,7 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
 
             # adopt the nmf representation
             y_nmf_valid = model(x_valid)
+            y_nmf_valid = (y_nmf_valid*std_Y) + mu_Y
             y_pred_valid = torch.mm(y_nmf_valid, nmf_components)
 
             loss_valid = loss_fn(y_pred_valid, y_valid)*1e4
