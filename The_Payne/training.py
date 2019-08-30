@@ -152,8 +152,8 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
 
             # adopt the nmf representation
             y_nmf = model(x[idx])
-            print(y_nmf.shape, std_Y.shape, mu_Y.shape)
-            y_nmf = (y_nmf*std_Y) + mu_Y
+            print(y_nmf.shape, std_nmf.shape, mu_nmf.shape)
+            y_nmf = (y_nmf*std_nmf) + mu_nmf
             y_pred = torch.mm(y_nmf, nmf_components)
 
             loss = loss_fn(y_pred, y[idx])*1e4
@@ -167,7 +167,7 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
 
             # adopt the nmf representation
             y_nmf_valid = model(x_valid)
-            y_nmf_valid = (y_nmf_valid*std_Y) + mu_Y
+            y_nmf_valid = (y_nmf_valid*std_nmf) + mu_nmf
             y_pred_valid = torch.mm(y_nmf_valid, nmf_components)
 
             loss_valid = loss_fn(y_pred_valid, y_valid)*1e4
