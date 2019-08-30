@@ -152,7 +152,6 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
 
             # adopt the nmf representation
             y_nmf = model(x[idx])
-            print(y_nmf.shape, std_nmf.shape, mu_nmf.shape)
             y_nmf = (y_nmf*std_nmf) + mu_nmf
             y_pred = torch.mm(y_nmf, nmf_components)
 
