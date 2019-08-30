@@ -93,7 +93,7 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
     # restore the NMF components
     temp = np.load("nmf_components.npz")
     nmf_components = temp["nmf_components"]
-    num_pixel = pca_components.shape[0]
+    num_pixel = nmf_components.shape[0]
 
 #--------------------------------------------------------------------------------------------
     # define neural networks
@@ -120,8 +120,7 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
 
 #--------------------------------------------------------------------------------------------
     # make NMF components pytorch variables as well
-    pca_components = Variable(torch.from_numpy(pca_components), requires_grad=False).type(dtype)
-    pca_mean = Variable(torch.from_numpy(pca_mean), requires_grad=False).type(dtype)
+    nmf_components = Variable(torch.from_numpy(nmf_components), requires_grad=False).type(dtype)
 
 #--------------------------------------------------------------------------------------------
     # break into batches
