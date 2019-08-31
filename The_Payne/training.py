@@ -131,7 +131,7 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
 
     # save scaling relation
     np.savez("NN_scaling.npz", x_min=x_min, x_max=x_max)
-    
+
     # dimension of the input
     dim_in = x.shape[1]
 
