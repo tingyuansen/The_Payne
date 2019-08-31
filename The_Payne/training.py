@@ -111,20 +111,20 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
                             torch.nn.Linear(num_neurons, num_features),
                             )
 
-            self.deconv1 = torch.nn.ConvTranspose1d(1, 1, conv_size, stride=3, padding=38)
-            self.deconv2 = torch.nn.ConvTranspose1d(1, 1, conv_size, stride=3, padding=38)
-            self.deconv3 = torch.nn.ConvTranspose1d(1, 1, conv_size, stride=3, padding=39)
+            self.deconv1 = torch.nn.ConvTranspose1d(1, 1, conv_size, stride=3, padding=17)
+            self.deconv2 = torch.nn.ConvTranspose1d(1, 1, conv_size, stride=3, padding=18)
+            self.deconv3 = torch.nn.ConvTranspose1d(1, 1, conv_size, stride=3, padding=19, output_padding=1)
 
             self.batch_norm1 = torch.nn.Sequential(
-                               torch.nn.BatchNorm1d(832),
+                               torch.nn.BatchNorm1d(874),
                                torch.nn.LeakyReLU()
                                )
             self.batch_norm2 = torch.nn.Sequential(
-                               torch.nn.BatchNorm1d(2428),
+                               torch.nn.BatchNorm1d(2594),
                                torch.nn.LeakyReLU()
                                )
             self.batch_norm3 = torch.nn.Sequential(
-                               torch.nn.BatchNorm1d(7214),
+                               torch.nn.BatchNorm1d(7753),
                                torch.nn.LeakyReLU()
                                )
 
@@ -187,7 +187,7 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
             y_pred = model(x[idx])
             print(y_pred.shape)
             print(y[idx].shape)
-            
+
             # adopt the nmf representation
             #y_nmf = model(x[idx])
             #y_nmf = (y_nmf*std_nmf) + mu_nmf
