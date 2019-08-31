@@ -42,16 +42,16 @@ class Payne_model(torch.nn.Module):
             torch.nn.Linear(num_neurons, num_features),
         )
 
-        self.deconv1 = torch.nn.ConvTranspose1d(1, 30, mask_size, stride=3, padding=17)
-        self.deconv2 = torch.nn.ConvTranspose1d(30, 30, mask_size, stride=3, padding=18)
-        self.deconv3 = torch.nn.ConvTranspose1d(30, 1, mask_size, stride=3, padding=19, output_padding=1)
+        self.deconv1 = torch.nn.ConvTranspose1d(1, 3, mask_size, stride=3, padding=17)
+        self.deconv2 = torch.nn.ConvTranspose1d(3, 3, mask_size, stride=3, padding=18)
+        self.deconv3 = torch.nn.ConvTranspose1d(3, 1, mask_size, stride=3, padding=19, output_padding=1)
 
         self.batch_norm1 = torch.nn.Sequential(
-                            torch.nn.BatchNorm1d(30),
+                            torch.nn.BatchNorm1d(3),
                             torch.nn.LeakyReLU()
         )
         self.batch_norm2 = torch.nn.Sequential(
-                            torch.nn.BatchNorm1d(30),
+                            torch.nn.BatchNorm1d(3),
                             torch.nn.LeakyReLU()
         )
         self.batch_norm3 = torch.nn.Sequential(
@@ -61,6 +61,7 @@ class Payne_model(torch.nn.Module):
 
     def forward(self, x):
         x = self.features(x)[:,None,:]
+        x = x.view(x.shape[0], 3, 300)
         x = self.deconv1(x)
         x = self.batch_norm1(x)
         x = self.deconv2(x)
@@ -74,7 +75,7 @@ class Payne_model(torch.nn.Module):
 # train neural networks
 def neural_net(training_labels, training_spectra, validation_labels, validation_spectra,\
              num_neurons = 300, num_steps=1e4, learning_rate=1e-4, batch_size=512,\
-             num_features = 300, mask_size=11):
+             num_features = 900, mask_size=11):
 
     '''
     Training neural networks to emulate spectral models
