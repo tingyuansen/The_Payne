@@ -31,9 +31,9 @@ from . import radam
 
 #===================================================================================================
 # define container
-class Payne_model(torch.nn.Module):
-    def __init__(self, dim_in, num_neurons, num_features, mask_size):
-        super(Payne_model, self).__init__()
+class Payne(torch.nn.Module):
+    def __init__(self):
+        super(Payne, self).__init__()
         self.features = torch.nn.Sequential(
             torch.nn.Linear(dim_in, num_neurons),
             torch.nn.LeakyReLU(),
@@ -42,9 +42,14 @@ class Payne_model(torch.nn.Module):
             torch.nn.Linear(num_neurons, num_features),
         )
 
-        self.deconv1 = torch.nn.ConvTranspose1d(3, 3, mask_size, stride=3, padding=17)
-        self.deconv2 = torch.nn.ConvTranspose1d(3, 3, mask_size, stride=3, padding=18)
-        self.deconv3 = torch.nn.ConvTranspose1d(3, 1, mask_size, stride=3, padding=19, output_padding=1)
+        #self.deconv1 = torch.nn.ConvTranspose1d(3, 3, mask_size, stride=3, padding=17)
+        #self.deconv2 = torch.nn.ConvTranspose1d(3, 3, mask_size, stride=3, padding=18)
+        #self.deconv3 = torch.nn.ConvTranspose1d(3, 1, mask_size, stride=3, padding=19, output_padding=1)
+
+        self.deconv1 = torch.nn.ConvTranspose1d(1, 3, mask_size, stride=2)
+        self.deconv2 = torch.nn.ConvTranspose1d(3, 3, mask_size, stride=2, output_padding=1)
+        self.deconv3 = torch.nn.ConvTranspose1d(3, 1, mask_size, stride=2)
+
 
         self.batch_norm1 = torch.nn.Sequential(
                             torch.nn.BatchNorm1d(3),
@@ -61,7 +66,7 @@ class Payne_model(torch.nn.Module):
 
     def forward(self, x):
         x = self.features(x)[:,None,:]
-        x = x.view(x.shape[0], 3, 300)
+        #x = x.view(x.shape[0], 3, 300)
         x = self.deconv1(x)
         x = self.batch_norm1(x)
         x = self.deconv2(x)
@@ -69,6 +74,9 @@ class Payne_model(torch.nn.Module):
         x = self.deconv3(x)
         x = self.batch_norm3(x)[:,0,:]
         return x
+
+
+#-----------------------------------------------------------------------------------
 
 
 #===================================================================================================
