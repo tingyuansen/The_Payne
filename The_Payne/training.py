@@ -184,12 +184,12 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
         # one step.
         for i in range(nbatches):
             idx = perm[i * batch_size : (i+1) * batch_size]
-            #y_pred = model(x[idx])
+            y_pred = model(x[idx])
 
             # adopt the nmf representation
             #y_nmf = model(x[idx])
             #y_nmf = (y_nmf*std_nmf) + mu_nmf
-            y_pred = torch.mm(y_nmf, nmf_components)
+            #y_pred = torch.mm(y_nmf, nmf_components)
 
             loss = loss_fn(y_pred, y[idx])*1e4
             optimizer.zero_grad()
@@ -198,12 +198,12 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
 
         # the average loss.
         if e % 10 == 0:
-            #y_pred_valid = model(x_valid)
+            y_pred_valid = model(x_valid)
 
             # adopt the nmf representation
             #y_nmf_valid = model(x_valid)
             #y_nmf_valid = (y_nmf_valid*std_nmf) + mu_nmf
-            y_pred_valid = torch.mm(y_nmf_valid, nmf_components)
+            #y_pred_valid = torch.mm(y_nmf_valid, nmf_components)
 
             loss_valid = loss_fn(y_pred_valid, y_valid)*1e4
             print('iter %s:' % e, 'training loss = %.3f' % loss,\
