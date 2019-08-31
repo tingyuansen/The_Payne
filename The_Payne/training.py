@@ -222,7 +222,7 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
             # record the weights and biases if the validation loss improves
             if loss_valid_data < current_loss:
                 current_loss = loss_valid
-                start_time = time.tim()
+                start_time = time.time()
                 torch.save(model, 'NN_normalized_spectra.pt')
                 print("time used in saving model: ", time.time()-start_time)
 
