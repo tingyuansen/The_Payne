@@ -129,6 +129,9 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
     x = (training_labels - x_min)/(x_max - x_min) - 0.5
     x_valid = (validation_labels-x_min)/(x_max-x_min) - 0.5
 
+    # save scaling relation
+    np.savez("NN_scaling.npz", x_min=x_min, x_max=x_max)
+    
     # dimension of the input
     dim_in = x.shape[1]
 
@@ -202,7 +205,7 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
             optimizer.step()
 
         # the average loss.
-        if e % 10 == 0:
+        if e % 100 == 0:
             y_pred_valid = model(x_valid)
 
             # adopt the nmf representation
@@ -222,9 +225,7 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
             # record the weights and biases if the validation loss improves
             if loss_valid_data < current_loss:
                 current_loss = loss_valid
-                start_time = time.time()
                 torch.save(model, 'NN_normalized_spectra.pt')
-                print("time used in saving model: ", time.time()-start_time)
 
                 #model_numpy = []
                 #for param in model.parameters():
