@@ -28,7 +28,8 @@ from torch.autograd import Variable
 from . import radam
 
 def neural_net(training_labels, training_spectra, validation_labels, validation_spectra,\
-             num_neurons = 300, num_steps=1e4, learning_rate=1e-3, batch_size=512):
+             num_neurons = 300, num_steps=1e4, learning_rate=1e-3, batch_size=512,\
+             num_features = 300, conv_size=11):
 
     '''
     Training neural networks to emulate spectral models
@@ -91,23 +92,53 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
 
 #--------------------------------------------------------------------------------------------
     # restore the NMF components
-    temp = np.load("nmf_components.npz")
-    nmf_components = temp["nmf_components"]
-    mu_nmf = temp["mu_Y"]
-    std_nmf = temp["std_Y"]
-    num_pixel = nmf_components.shape[0]
+    #temp = np.load("nmf_components.npz")
+    #nmf_components = temp["nmf_components"]
+    #mu_nmf = temp["mu_Y"]
+    #std_nmf = temp["std_Y"]
+    #num_pixel = nmf_components.shape[0]
 
 #--------------------------------------------------------------------------------------------
-    # define neural networks
-    model = torch.nn.Sequential(
-        torch.nn.Linear(dim_in, num_neurons),
-        torch.nn.LeakyReLU(),
-        torch.nn.Linear(num_neurons, num_neurons),
-        torch.nn.LeakyReLU(),
-        torch.nn.Linear(num_neurons, num_pixel)
-    )
-    model.cuda()
+    # define container
+    class Payne(torch.nn.Module):
+        def __init__(self):
+            super(Payne, self).__init__()
+            self.features = torch.nn.Sequential(
+                            torch.nn.Linear(dim_in, num_neurons),
+                            torch.nn.LeakyReLU(),
+                            torch.nn.Linear(num_neurons, num_neurons),
+                            torch.nn.LeakyReLU(),
+                            torch.nn.Linear(num_neurons, num_features),
+                            )
 
+            self.deconv1 = torch.nn.ConvTranspose1d(1, 1, conv_size, stride=3, padding=38)
+            self.deconv2 = torch.nn.ConvTranspose1d(1, 1, conv_size, stride=3, padding=38)
+            self.deconv3 = torch.nn.ConvTranspose1d(1, 1, conv_size, stride=3, padding=39)
+
+            self.batch_norm1 = torch.nn.Sequential(
+                               torch.nn.BatchNorm1d(832),
+                               torch.nn.LeakyReLU()
+                               )
+            self.batch_norm2 = torch.nn.Sequential(
+                               torch.nn.BatchNorm1d(2428),
+                               torch.nn.LeakyReLU()
+                               )
+            self.batch_norm3 = torch.nn.Sequential(
+                               torch.nn.BatchNorm1d(7214),
+                               torch.nn.LeakyReLU()
+                               )
+
+        def forward(self, x):
+            x = self.features(x)[:,None,:]
+            x = self.deconv1(x)[:,0,:]
+            x = self.batch_norm1(x)[:,None,:]
+            x = self.deconv2(x)[:,0,:]
+            x = self.batch_norm2(x)[:,None,:]
+            x = self.deconv3(x)[:,0,:]
+            x = self.batch_norm3(x)[:,None,:]
+            return x
+
+#--------------------------------------------------------------------------------------------
     # assume L2 loss
     loss_fn = torch.nn.L1Loss(reduction = 'mean')
 
@@ -117,14 +148,19 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
     x_valid = Variable(torch.from_numpy(x_valid)).type(dtype)
     y_valid = Variable(torch.from_numpy(validation_spectra), requires_grad=False).type(dtype)
 
-    # weight_decay is for regularization. Not required, but one can play with it.
-    optimizer = radam.RAdam(model.parameters(), lr=learning_rate, weight_decay = 0)
+    # initiate Payne and optimizer
+    model = Payne()
+    model.cuda()
+    model.train()
+
+    #optimizer = radam.RAdam(model.parameters(), lr=learning_rate, weight_decay = 0)
+    optimizer = radam.RAdam([p for p in model.parameters() if p.requires_grad==True], lr=learning_rate)
 
 #--------------------------------------------------------------------------------------------
     # make NMF components pytorch variables as well
-    nmf_components = Variable(torch.from_numpy(nmf_components), requires_grad=False).type(dtype)
-    mu_nmf = Variable(torch.from_numpy(mu_nmf), requires_grad=False).type(dtype)
-    std_nmf = Variable(torch.from_numpy(std_nmf), requires_grad=False).type(dtype)
+    #nmf_components = Variable(torch.from_numpy(nmf_components), requires_grad=False).type(dtype)
+    #mu_nmf = Variable(torch.from_numpy(mu_nmf), requires_grad=False).type(dtype)
+    #std_nmf = Variable(torch.from_numpy(std_nmf), requires_grad=False).type(dtype)
 
 #--------------------------------------------------------------------------------------------
     # break into batches
@@ -151,8 +187,8 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
             #y_pred = model(x[idx])
 
             # adopt the nmf representation
-            y_nmf = model(x[idx])
-            y_nmf = (y_nmf*std_nmf) + mu_nmf
+            #y_nmf = model(x[idx])
+            #y_nmf = (y_nmf*std_nmf) + mu_nmf
             y_pred = torch.mm(y_nmf, nmf_components)
 
             loss = loss_fn(y_pred, y[idx])*1e4
@@ -165,8 +201,8 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
             #y_pred_valid = model(x_valid)
 
             # adopt the nmf representation
-            y_nmf_valid = model(x_valid)
-            y_nmf_valid = (y_nmf_valid*std_nmf) + mu_nmf
+            #y_nmf_valid = model(x_valid)
+            #y_nmf_valid = (y_nmf_valid*std_nmf) + mu_nmf
             y_pred_valid = torch.mm(y_nmf_valid, nmf_components)
 
             loss_valid = loss_fn(y_pred_valid, y_valid)*1e4
@@ -181,30 +217,32 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
             # record the weights and biases if the validation loss improves
             if loss_valid_data < current_loss:
                 current_loss = loss_valid
-                model_numpy = []
-                for param in model.parameters():
-                    model_numpy.append(param.data.cpu().numpy())
+                torch.save(model, 'NN_normalized_spectra.pt')
+
+                #model_numpy = []
+                #for param in model.parameters():
+                #    model_numpy.append(param.data.cpu().numpy())
 
 #--------------------------------------------------------------------------------------------
     # extract the weights and biases
-    w_array_0 = model_numpy[0]
-    b_array_0 = model_numpy[1]
-    w_array_1 = model_numpy[2]
-    b_array_1 = model_numpy[3]
-    w_array_2 = model_numpy[4]
-    b_array_2 = model_numpy[5]
+    #w_array_0 = model_numpy[0]
+    #b_array_0 = model_numpy[1]
+    #w_array_1 = model_numpy[2]
+    #b_array_1 = model_numpy[3]
+    #w_array_2 = model_numpy[4]
+    #b_array_2 = model_numpy[5]
 
     # save parameters and remember how we scaled the labels
-    np.savez("NN_normalized_spectra.npz",\
-             w_array_0 = w_array_0,\
-             w_array_1 = w_array_1,\
-             w_array_2 = w_array_2,\
-             b_array_0 = b_array_0,\
-             b_array_1 = b_array_1,\
-             b_array_2 = b_array_2,\
-             x_max=x_max,\
-             x_min=x_min,\
-             training_loss = training_loss,\
-             validation_loss = validation_loss)
+    #np.savez("NN_normalized_spectra.npz",\
+    #         w_array_0 = w_array_0,\
+    #         w_array_1 = w_array_1,\
+    #         w_array_2 = w_array_2,\
+    #         b_array_0 = b_array_0,\
+    #         b_array_1 = b_array_1,\
+    #         b_array_2 = b_array_2,\
+    #         x_max=x_max,\
+    #         x_min=x_min,\
+    #         training_loss = training_loss,\
+    #         validation_loss = validation_loss)
 
     return training_loss, validation_loss
