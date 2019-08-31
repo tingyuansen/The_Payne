@@ -42,7 +42,7 @@ class Payne_model(torch.nn.Module):
             torch.nn.Linear(num_neurons, num_features),
         )
 
-        self.deconv1 = torch.nn.ConvTranspose1d(1, 3, mask_size, stride=3, padding=17)
+        self.deconv1 = torch.nn.ConvTranspose1d(3, 3, mask_size, stride=3, padding=17)
         self.deconv2 = torch.nn.ConvTranspose1d(3, 3, mask_size, stride=3, padding=18)
         self.deconv3 = torch.nn.ConvTranspose1d(3, 1, mask_size, stride=3, padding=19, output_padding=1)
 
