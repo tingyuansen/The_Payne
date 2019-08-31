@@ -31,9 +31,9 @@ from . import radam
 
 #===================================================================================================
 # define container
-class Payne(torch.nn.Module):
+class Payne_model(torch.nn.Module):
     def __init__(self):
-        super(Payne, self).__init__()
+        super(Payne_model, self).__init__()
         self.features = torch.nn.Sequential(
             torch.nn.Linear(dim_in, num_neurons),
             torch.nn.LeakyReLU(),
