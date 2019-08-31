@@ -27,9 +27,53 @@ import torch
 from torch.autograd import Variable
 from . import radam
 
+
+#===================================================================================================
+# define container
+class Payne(torch.nn.Module):
+    def __init__(self, dim_in, num_neurons, num_features, mask_size):
+        super(Payne, self).__init__()
+        self.features = torch.nn.Sequential(
+            torch.nn.Linear(dim_in, num_neurons),
+            torch.nn.LeakyReLU(),
+            torch.nn.Linear(num_neurons, num_neurons),
+            torch.nn.LeakyReLU(),
+            torch.nn.Linear(num_neurons, num_features),
+        )
+
+        self.deconv1 = torch.nn.ConvTranspose1d(1, 1, mask_size, stride=3, padding=17)
+        self.deconv2 = torch.nn.ConvTranspose1d(1, 1, mask_size, stride=3, padding=18)
+        self.deconv3 = torch.nn.ConvTranspose1d(1, 1, mask_size, stride=3, padding=19, output_padding=1)
+
+        self.batch_norm1 = torch.nn.Sequential(
+                            torch.nn.BatchNorm1d(874),
+                            torch.nn.LeakyReLU()
+        )
+        self.batch_norm2 = torch.nn.Sequential(
+                            torch.nn.BatchNorm1d(2594),
+                            torch.nn.LeakyReLU()
+        )
+        self.batch_norm3 = torch.nn.Sequential(
+                            torch.nn.BatchNorm1d(7753),
+                            torch.nn.LeakyReLU()
+        )
+
+    def forward(self, x):
+        x = self.features(x)[:,None,:]
+        x = self.deconv1(x)[:,0,:]
+        x = self.batch_norm1(x)[:,None,:]
+        x = self.deconv2(x)[:,0,:]
+        x = self.batch_norm2(x)[:,None,:]
+        x = self.deconv3(x)[:,0,:]
+        x = self.batch_norm3(x)
+        return x
+
+
+#===================================================================================================
+# train neural networks
 def neural_net(training_labels, training_spectra, validation_labels, validation_spectra,\
              num_neurons = 300, num_steps=1e4, learning_rate=1e-3, batch_size=512,\
-             num_features = 300, conv_size=11):
+             num_features = 300, mask_size=11):
 
     '''
     Training neural networks to emulate spectral models
@@ -99,46 +143,6 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
     #num_pixel = nmf_components.shape[0]
 
 #--------------------------------------------------------------------------------------------
-    # define container
-    class Payne(torch.nn.Module):
-        def __init__(self):
-            super(Payne, self).__init__()
-            self.features = torch.nn.Sequential(
-                            torch.nn.Linear(dim_in, num_neurons),
-                            torch.nn.LeakyReLU(),
-                            torch.nn.Linear(num_neurons, num_neurons),
-                            torch.nn.LeakyReLU(),
-                            torch.nn.Linear(num_neurons, num_features),
-                            )
-
-            self.deconv1 = torch.nn.ConvTranspose1d(1, 1, conv_size, stride=3, padding=17)
-            self.deconv2 = torch.nn.ConvTranspose1d(1, 1, conv_size, stride=3, padding=18)
-            self.deconv3 = torch.nn.ConvTranspose1d(1, 1, conv_size, stride=3, padding=19, output_padding=1)
-
-            self.batch_norm1 = torch.nn.Sequential(
-                               torch.nn.BatchNorm1d(874),
-                               torch.nn.LeakyReLU()
-                               )
-            self.batch_norm2 = torch.nn.Sequential(
-                               torch.nn.BatchNorm1d(2594),
-                               torch.nn.LeakyReLU()
-                               )
-            self.batch_norm3 = torch.nn.Sequential(
-                               torch.nn.BatchNorm1d(7753),
-                               torch.nn.LeakyReLU()
-                               )
-
-        def forward(self, x):
-            x = self.features(x)[:,None,:]
-            x = self.deconv1(x)[:,0,:]
-            x = self.batch_norm1(x)[:,None,:]
-            x = self.deconv2(x)[:,0,:]
-            x = self.batch_norm2(x)[:,None,:]
-            x = self.deconv3(x)[:,0,:]
-            x = self.batch_norm3(x)
-            return x
-
-#--------------------------------------------------------------------------------------------
     # assume L2 loss
     loss_fn = torch.nn.L1Loss(reduction = 'mean')
 
@@ -149,7 +153,7 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
     y_valid = Variable(torch.from_numpy(validation_spectra), requires_grad=False).type(dtype)
 
     # initiate Payne and optimizer
-    model = Payne()
+    model = Payne(dim_in, num_neurons, num_features, mask_size)
     model.cuda()
     model.train()
 
@@ -185,8 +189,6 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
         for i in range(nbatches):
             idx = perm[i * batch_size : (i+1) * batch_size]
             y_pred = model(x[idx])
-            print(y_pred.shape)
-            print(y[idx].shape)
 
             # adopt the nmf representation
             #y_nmf = model(x[idx])
