@@ -76,9 +76,6 @@ class Payne_model(torch.nn.Module):
         return x
 
 
-#-----------------------------------------------------------------------------------
-
-
 #===================================================================================================
 # train neural networks
 def neural_net(training_labels, training_spectra, validation_labels, validation_spectra,\
