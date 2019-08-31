@@ -24,6 +24,7 @@ import numpy as np
 import sys
 import os
 import torch
+import time
 from torch.autograd import Variable
 from . import radam
 
@@ -221,8 +222,9 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
             # record the weights and biases if the validation loss improves
             if loss_valid_data < current_loss:
                 current_loss = loss_valid
+                start_time = time.tim()
                 torch.save(model, 'NN_normalized_spectra.pt')
-
+                print("time used in saving model: ", time.time()-start_time)
                 #model_numpy = []
                 #for param in model.parameters():
                 #    model_numpy.append(param.data.cpu().numpy())
