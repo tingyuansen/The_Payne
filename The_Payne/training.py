@@ -185,7 +185,9 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
         for i in range(nbatches):
             idx = perm[i * batch_size : (i+1) * batch_size]
             y_pred = model(x[idx])
-
+            print(y_pred.shape)
+            print(y[idx].shape)
+            
             # adopt the nmf representation
             #y_nmf = model(x[idx])
             #y_nmf = (y_nmf*std_nmf) + mu_nmf
