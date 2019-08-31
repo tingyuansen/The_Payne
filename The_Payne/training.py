@@ -42,16 +42,16 @@ class Payne_model(torch.nn.Module):
             torch.nn.Linear(num_neurons, num_features),
         )
 
-        self.deconv1 = torch.nn.ConvTranspose1d(1, 1, mask_size, stride=3, padding=17)
-        self.deconv2 = torch.nn.ConvTranspose1d(1, 1, mask_size, stride=3, padding=18)
-        self.deconv3 = torch.nn.ConvTranspose1d(1, 1, mask_size, stride=3, padding=19, output_padding=1)
+        self.deconv1 = torch.nn.ConvTranspose1d(1, 3, mask_size, stride=3, padding=17)
+        self.deconv2 = torch.nn.ConvTranspose1d(3, 3, mask_size, stride=3, padding=18)
+        self.deconv3 = torch.nn.ConvTranspose1d(3, 1, mask_size, stride=3, padding=19, output_padding=1)
 
         self.batch_norm1 = torch.nn.Sequential(
-                            torch.nn.BatchNorm1d(1),
+                            torch.nn.BatchNorm1d(3),
                             torch.nn.LeakyReLU()
         )
         self.batch_norm2 = torch.nn.Sequential(
-                            torch.nn.BatchNorm1d(1),
+                            torch.nn.BatchNorm1d(3),
                             torch.nn.LeakyReLU()
         )
         self.batch_norm3 = torch.nn.Sequential(
