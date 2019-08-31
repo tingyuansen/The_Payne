@@ -31,7 +31,7 @@ from . import radam
 
 #===================================================================================================
 # define container
-class Payne(torch.nn.Module):
+class Payne_model(torch.nn.Module):
     def __init__(self, dim_in, num_neurons, num_features, mask_size):
         super(Payne, self).__init__()
         self.features = torch.nn.Sequential(
@@ -154,7 +154,7 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
     y_valid = Variable(torch.from_numpy(validation_spectra), requires_grad=False).type(dtype)
 
     # initiate Payne and optimizer
-    model = Payne(dim_in, num_neurons, num_features, mask_size)
+    model = Payne_model(dim_in, num_neurons, num_features, mask_size)
     model.cuda()
     model.train()
 
@@ -225,6 +225,7 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
                 start_time = time.tim()
                 torch.save(model, 'NN_normalized_spectra.pt')
                 print("time used in saving model: ", time.time()-start_time)
+
                 #model_numpy = []
                 #for param in model.parameters():
                 #    model_numpy.append(param.data.cpu().numpy())
