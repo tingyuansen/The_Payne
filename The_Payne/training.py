@@ -233,6 +233,9 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
             loss.backward(retain_graph=True)
             optimizer.step()
 
+        # garbage collect
+        torch.cuda.empty_cache()
+        
         # the average loss.
         if e % 100 == 0:
             y_pred_valid = model(x_valid)
@@ -263,9 +266,6 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
                 #model_numpy = []
                 #for param in model.parameters():
                 #    model_numpy.append(param.data.cpu().numpy())
-
-            # garbage collect
-            torch.cuda.empty_cache()
 
 #--------------------------------------------------------------------------------------------
     # extract the weights and biases
