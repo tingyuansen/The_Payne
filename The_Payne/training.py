@@ -235,8 +235,10 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
             optimizer.step()
 
         # garbage collect
+        start_time = time.time()
         gc.collect()
-
+        print("garbage collect time", time.time()-start_time)
+        
         # the average loss.
         if e % 100 == 0:
             y_pred_valid = model(x_valid)
