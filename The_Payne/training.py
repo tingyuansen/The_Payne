@@ -42,9 +42,12 @@ class Payne_model(torch.nn.Module):
             torch.nn.Linear(num_neurons, num_features),
         )
 
-        self.deconv1 = torch.nn.ConvTranspose1d(3, 3, mask_size, stride=4)
-        self.deconv2 = torch.nn.ConvTranspose1d(3, 3, mask_size, stride=4, padding=1)
-        self.deconv3 = torch.nn.ConvTranspose1d(3, 1, mask_size, stride=4, padding=1)
+        self.deconv1 = torch.nn.ConvTranspose1d(3, 8, mask_size, stride=2)
+        self.deconv2 = torch.nn.ConvTranspose1d(8, 16, mask_size, stride=2, output_padding=1)
+        self.deconv3 = torch.nn.ConvTranspose1d(16, 32, mask_size, stride=2)
+        self.deconv4 = torch.nn.ConvTranspose1d(32, 16, mask_size, stride=2)
+        self.deconv5 = torch.nn.ConvTranspose1d(16, 8, mask_size, stride=2, output_padding=1)
+        self.deconv6 = torch.nn.ConvTranspose1d(8, 1, mask_size, stride=2)
 
         #self.deconv1 = torch.nn.ConvTranspose1d(1, 3, mask_size, stride=2)
         #self.deconv2 = torch.nn.ConvTranspose1d(3, 3, mask_size, stride=2, output_padding=1)
@@ -52,27 +55,45 @@ class Payne_model(torch.nn.Module):
 
 
         self.batch_norm1 = torch.nn.Sequential(
-                            torch.nn.BatchNorm1d(3),
+                            torch.nn.BatchNorm1d(8),
                             torch.nn.LeakyReLU()
         )
         self.batch_norm2 = torch.nn.Sequential(
-                            torch.nn.BatchNorm1d(3),
+                            torch.nn.BatchNorm1d(16),
                             torch.nn.LeakyReLU()
         )
         self.batch_norm3 = torch.nn.Sequential(
+                            torch.nn.BatchNorm1d(32),
+                            torch.nn.LeakyReLU()
+        )
+        self.batch_norm4 = torch.nn.Sequential(
+                            torch.nn.BatchNorm1d(16),
+                            torch.nn.LeakyReLU()
+        )
+        self.batch_norm5 = torch.nn.Sequential(
+                            torch.nn.BatchNorm1d(8),
+                            torch.nn.LeakyReLU()
+        )
+        self.batch_norm6 = torch.nn.Sequential(
                             torch.nn.BatchNorm1d(1),
                             torch.nn.LeakyReLU()
         )
 
     def forward(self, x):
         x = self.features(x)[:,None,:]
-        x = x.view(x.shape[0], 3, 119)
+        x = x.view(x.shape[0], 3, 112)
         x = self.deconv1(x)
         x = self.batch_norm1(x)
         x = self.deconv2(x)
         x = self.batch_norm2(x)
         x = self.deconv3(x)
-        x = self.batch_norm3(x)[:,0,:]
+        x = self.batch_norm3(x)
+        x = self.deconv4(x)
+        x = self.batch_norm4(x)
+        x = self.deconv5(x)
+        x = self.batch_norm5(x)
+        x = self.deconv6(x)
+        x = self.batch_norm6(x)[:,0,:]
         return x
 
 
