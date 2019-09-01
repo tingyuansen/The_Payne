@@ -265,7 +265,7 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
                 #model_numpy = []
                 #for param in model.parameters():
                 #    model_numpy.append(param.data.cpu().numpy())
-                
+
                 np.savez("training_loss.npz",\
                          training_loss = training_loss,\
                          validation_loss = validation_loss)
@@ -275,8 +275,6 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
             print('current memory allocated: {}'.format(torch.cuda.memory_allocated() / 1024 ** 2))
             print('max memory allocated: {}'.format(torch.cuda.max_memory_allocated() / 1024 ** 2))
             print('cached memory: {}'.format(torch.cuda.memory_cached() / 1024 ** 2))
-
-
 
 #--------------------------------------------------------------------------------------------
     # extract the weights and biases
