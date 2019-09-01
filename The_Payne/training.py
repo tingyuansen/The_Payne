@@ -256,13 +256,13 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
             #validation_loss.append(loss_valid_data)
 
             # record the weights and biases if the validation loss improves
-            if loss_valid.data.item() < current_loss:
-                current_loss = loss_valid.data.item()
+            #if loss_valid.data.item() < current_loss:
+                #current_loss = loss_valid.data.item()
 
-                state_dict =  model.state_dict()
-                for k, v in state_dict.items():
-                    state_dict[k] = v.cpu()
-                torch.save(state_dict, 'NN_normalized_spectra.pt')
+                #state_dict =  model.state_dict()
+                #for k, v in state_dict.items():
+                #    state_dict[k] = v.cpu()
+                #torch.save(state_dict, 'NN_normalized_spectra.pt')
 
                 #np.savez("training_loss.npz",\
                 #        training_loss = training_loss,\
