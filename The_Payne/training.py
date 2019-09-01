@@ -256,13 +256,17 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
                 current_loss = loss_valid
                 torch.save(model, 'NN_normalized_spectra.pt')
 
+                np.savez("training_loss.npz",\
+                         training_loss = training_loss,\
+                         validation_loss = validation_loss)
+
                 #model_numpy = []
                 #for param in model.parameters():
                 #    model_numpy.append(param.data.cpu().numpy())
 
             # garbage collect
             torch.cuda.empty_cache()
-            
+
 #--------------------------------------------------------------------------------------------
     # extract the weights and biases
     #w_array_0 = model_numpy[0]
@@ -284,5 +288,9 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
     #         x_min=x_min,\
     #         training_loss = training_loss,\
     #         validation_loss = validation_loss)
+
+    np.savez("training_loss.npz",\
+             training_loss = training_loss,\
+             validation_loss = validation_loss)
 
     return training_loss, validation_loss
