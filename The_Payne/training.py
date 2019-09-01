@@ -260,7 +260,7 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
                 current_loss = loss_valid
 
                 start_time = time.time()
-                torch.save(model:clone(), 'NN_normalized_spectra.pt')
+                torch.save(deepCopy(model), 'NN_normalized_spectra.pt')
                 print("clone time:", time.time()-start_time)
 
                 np.savez("training_loss.npz",\
