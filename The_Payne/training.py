@@ -255,10 +255,10 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
             if loss_valid.data.item() < current_loss:
                 current_loss = loss_valid.data.item()
 
-                #state_dict =  model.state_dict()
-                #for k, v in state_dict.items():
-                #    state_dict[k] = v.cpu()
-                #torch.save(state_dict, 'NN_normalized_spectra.pt')
+                state_dict =  model.state_dict()
+                for k, v in state_dict.items():
+                    state_dict[k] = v.cpu()
+                torch.save(state_dict, 'NN_normalized_spectra.pt')
 
                 #model_numpy = []
                 #for param in model.parameters():
