@@ -233,10 +233,7 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
             loss.backward(retain_graph=False)
             optimizer.step()
 
-        # check allocated memory
-        print('current memory allocated: {}'.format(torch.cuda.memory_allocated() / 1024 ** 2))
-        print('max memory allocated: {}'.format(torch.cuda.max_memory_allocated() / 1024 ** 2))
-        print('cached memory: {}'.format(torch.cuda.memory_cached() / 1024 ** 2))
+
 
         # the average loss.
         if e % 100 == 0:
@@ -265,14 +262,21 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
                     state_dict[k] = v.cpu()
                 torch.save(state_dict, 'NN_normalized_spectra.pt')
 
+                #model_numpy = []
+                #for param in model.parameters():
+                #    model_numpy.append(param.data.cpu().numpy())
+                
                 np.savez("training_loss.npz",\
                          training_loss = training_loss,\
                          validation_loss = validation_loss)
             torch.cuda.empty_cache()
 
-                #model_numpy = []
-                #for param in model.parameters():
-                #    model_numpy.append(param.data.cpu().numpy())
+            # check allocated memory
+            print('current memory allocated: {}'.format(torch.cuda.memory_allocated() / 1024 ** 2))
+            print('max memory allocated: {}'.format(torch.cuda.max_memory_allocated() / 1024 ** 2))
+            print('cached memory: {}'.format(torch.cuda.memory_cached() / 1024 ** 2))
+
+
 
 #--------------------------------------------------------------------------------------------
     # extract the weights and biases
