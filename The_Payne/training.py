@@ -27,7 +27,6 @@ import torch
 import time
 from torch.autograd import Variable
 from . import radam
-import gc
 
 
 #===================================================================================================
@@ -236,7 +235,7 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
 
         # garbage collect
         start_time = time.time()
-        gc.collect()
+        torch.cuda.empty_cache()
         print("garbage collect time", time.time()-start_time)
 
         # the average loss.
