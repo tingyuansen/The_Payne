@@ -259,9 +259,9 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
             if loss_valid_data < current_loss:
                 current_loss = loss_valid
 
-                start_time = time.time()
-                torch.save(deepCopy(model), 'NN_normalized_spectra.pt')
-                print("clone time:", time.time()-start_time)
+                #start_time = time.time()
+                torch.save(model.state_dict(), 'NN_normalized_spectra.pt')
+                #print("clone time:", time.time()-start_time)
 
                 np.savez("training_loss.npz",\
                         training_loss = training_loss,\
