@@ -42,10 +42,9 @@ class Payne_model(torch.nn.Module):
             torch.nn.Linear(num_neurons, num_features),
         )
 
-        self.deconv1 = torch.nn.ConvTranspose1d(1, 3, mask_size, stride=3)
-        self.deconv1b = torch.nn.ConvTranspose1d(3, 3, mask_size, stride=1)
-        self.deconv2 = torch.nn.ConvTranspose1d(3, 3, mask_size, stride=3)
-        self.deconv3 = torch.nn.ConvTranspose1d(3, 1, mask_size, stride=3, padding=1, output_padding=1)
+        self.deconv1 = torch.nn.ConvTranspose1d(3, 3, mask_size, stride=4)
+        self.deconv2 = torch.nn.ConvTranspose1d(3, 3, mask_size, stride=4, padding=1)
+        self.deconv3 = torch.nn.ConvTranspose1d(3, 1, mask_size, stride=4, padding=1)
 
         #self.deconv1 = torch.nn.ConvTranspose1d(1, 3, mask_size, stride=2)
         #self.deconv2 = torch.nn.ConvTranspose1d(3, 3, mask_size, stride=2, output_padding=1)
@@ -53,10 +52,6 @@ class Payne_model(torch.nn.Module):
 
 
         self.batch_norm1 = torch.nn.Sequential(
-                            torch.nn.BatchNorm1d(3),
-                            torch.nn.LeakyReLU()
-        )
-        self.batch_norm1b = torch.nn.Sequential(
                             torch.nn.BatchNorm1d(3),
                             torch.nn.LeakyReLU()
         )
@@ -71,11 +66,9 @@ class Payne_model(torch.nn.Module):
 
     def forward(self, x):
         x = self.features(x)[:,None,:]
-        #x = x.view(x.shape[0], 3, 300)
+        x = x.view(x.shape[0], 3, 119)
         x = self.deconv1(x)
         x = self.batch_norm1(x)
-        x = self.deconv1b(x)
-        x = self.batch_norm1b(x)
         x = self.deconv2(x)
         x = self.batch_norm2(x)
         x = self.deconv3(x)
