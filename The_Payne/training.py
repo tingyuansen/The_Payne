@@ -246,14 +246,14 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
             print('iter %s:' % e, 'training loss = %.3f' % loss,\
                  'validation loss = %.3f' % loss_valid)
 
-            #loss_data = loss.data.item()
-            #loss_valid_data = loss_valid.data.item()
-            #training_loss.append(loss_data)
-            #validation_loss.append(loss_valid_data)
+            loss_data = loss.data.item().detach()
+            loss_valid_data = loss_valid.data.item().detach()
+            training_loss.append(loss_data)
+            validation_loss.append(loss_valid_data)
 
             # record the weights and biases if the validation loss improves
-            if loss_valid.data.item() < current_loss:
-                current_loss = loss_valid.data.item()
+            if loss_valid_data < current_loss:
+                current_loss = loss_valid_data
 
                 state_dict =  model.state_dict()
                 for k, v in state_dict.items():
@@ -264,9 +264,9 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
                 #for param in model.parameters():
                 #    model_numpy.append(param.data.cpu().numpy())
 
-                #np.savez("training_loss.npz",\
-                #         training_loss = training_loss,\
-                #         validation_loss = validation_loss)
+                np.savez("training_loss.npz",\
+                         training_loss = training_loss,\
+                         validation_loss = validation_loss)
 
             # clear cache to save memory
             torch.cuda.empty_cache()
