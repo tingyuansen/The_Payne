@@ -246,10 +246,8 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
             print('iter %s:' % e, 'training loss = %.3f' % loss,\
                  'validation loss = %.3f' % loss_valid)
 
-            start_time = time.time()
             loss_data = loss.detach().data.item()
             loss_valid_data = loss_valid.detach().data.item()
-            print(time.time()-start_time)
             training_loss.append(loss_data)
             validation_loss.append(loss_valid_data)
 
