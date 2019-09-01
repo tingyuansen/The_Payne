@@ -233,6 +233,7 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
             loss.backward(retain_graph=False)
             optimizer.step()
 
+        # check allocated memory
         print('current memory allocated: {}'.format(torch.cuda.memory_allocated() / 1024 ** 2))
         print('max memory allocated: {}'.format(torch.cuda.max_memory_allocated() / 1024 ** 2))
         print('cached memory: {}'.format(torch.cuda.memory_cached() / 1024 ** 2))
@@ -267,7 +268,7 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
                 np.savez("training_loss.npz",\
                          training_loss = training_loss,\
                          validation_loss = validation_loss)
-                torch.cuda.empty_cache()
+            torch.cuda.empty_cache()
 
                 #model_numpy = []
                 #for param in model.parameters():
