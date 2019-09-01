@@ -27,6 +27,7 @@ import torch
 import time
 from torch.autograd import Variable
 from . import radam
+import gc
 
 
 #===================================================================================================
@@ -232,6 +233,9 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
             optimizer.zero_grad()
             loss.backward(retain_graph=True)
             optimizer.step()
+
+        # garbage collect
+        gc.collect()
 
         # the average loss.
         if e % 100 == 0:
