@@ -230,12 +230,12 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
 
             loss = loss_fn(y_pred, y[idx])*1e4
             optimizer.zero_grad()
-            loss.backward(retain_graph=True)
+            loss.backward(retain_graph=False)
             optimizer.step()
 
         # garbage collect
-        torch.cuda.empty_cache()
-        
+        #torch.cuda.empty_cache()
+
         # the average loss.
         if e % 100 == 0:
             y_pred_valid = model(x_valid)
