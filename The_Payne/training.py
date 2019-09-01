@@ -237,9 +237,6 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
         print('max memory allocated: {}'.format(torch.cuda.max_memory_allocated() / 1024 ** 2))
         print('cached memory: {}'.format(torch.cuda.memory_cached() / 1024 ** 2))
 
-        # garbage collect
-        #torch.cuda.empty_cache()
-
         # the average loss.
         if e % 100 == 0:
             y_pred_valid = model(x_valid)
@@ -261,14 +258,14 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
             # record the weights and biases if the validation loss improves
             if loss_valid_data < current_loss:
                 current_loss = loss_valid
-                model.cpu()
-                torch.save(model, 'NN_normalized_spectra.pt')
-                model.cuda()
-            #torch.cuda.empty_cache()
 
-                #np.savez("training_loss.npz",\
-                #         training_loss = training_loss,\
-                #         validation_loss = validation_loss)
+                start_time = time.time()
+                torch.save(model:clone(), 'NN_normalized_spectra.pt')
+                print("clone time:", time.time()-start_time)
+
+                np.savez("training_loss.npz",\
+                        training_loss = training_loss,\
+                        validation_loss = validation_loss)
 
                 #model_numpy = []
                 #for param in model.parameters():
