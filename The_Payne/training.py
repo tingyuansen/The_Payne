@@ -259,7 +259,7 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
             validation_loss.append(loss_valid_data)
 
             # record the weights and biases if the validation loss improves
-            if loss_valid_valid_data < current_loss:
+            if loss_valid_data < current_loss:
                 current_loss = loss_valid
                 torch.save(model.clone(), 'NN_normalized_spectra.pt')
             #torch.cuda.empty_cache()
