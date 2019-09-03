@@ -164,9 +164,6 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
     # dimension of the input
     dim_in = x.shape[1]
 
-    # dimension of the output
-    #num_pixel = training_spectra.shape[1]
-
 #--------------------------------------------------------------------------------------------
     # restore the NMF components
     #temp = np.load("nmf_components.npz")
@@ -204,6 +201,9 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
     nsamples = x.shape[0]
     nbatches = nsamples // batch_size
 
+    nsamples_valid = x_valid.shape[0]
+    nbatches_valid = nsamples_valid // batch_size
+
     # initiate counter
     current_loss = np.inf
     training_loss =[]
@@ -235,38 +235,43 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
 
         # the average loss.
         if e % 100 == 0:
-            #y_pred_valid = model(x_valid)
+
+            # randomly permute the data
+            perm_valid = torch.randperm(nsamples)
+            perm_valid = perm_valid.cuda()
+            loss_valid = 0
+
+            for j in range(nbatches_valid):
+                idx = perm_valid[j * batch_size : (j+1) * batch_size]
+                y_pred_valid = model(x_valid[idx])
+                loss_valid += loss_fn(y_pred_valid, y_valid[idx])*1e4
+            loss_valid /= nbatches_valid
 
             # adopt the nmf representation
             #y_nmf_valid = model(x_valid)
             #y_nmf_valid = (y_nmf_valid*std_nmf) + mu_nmf
             #y_pred_valid = torch.mm(y_nmf_valid, nmf_components)
 
-            #loss_valid = loss_fn(y_pred_valid, y_valid)*1e4
-            #print('iter %s:' % e, 'training loss = %.3f' % loss,\
-            #     'validation loss = %.3f' % loss_valid)
+            print('iter %s:' % e, 'training loss = %.3f' % loss,\
+                 'validation loss = %.3f' % loss_valid)
 
-            #loss_data = loss.detach().data.item()
-            #loss_valid_data = loss_valid.detach().data.item()
-            #training_loss.append(loss_data)
-            #validation_loss.append(loss_valid_data)
+            loss_data = loss.detach().data.item()
+            loss_valid_data = loss_valid.detach().data.item()
+            training_loss.append(loss_data)
+            validation_loss.append(loss_valid_data)
 
             # record the weights and biases if the validation loss improves
-            #if loss_valid_data < current_loss:
-            #    current_loss = loss_valid_data
+            if loss_valid_data < current_loss:
+                current_loss = loss_valid_data
 
-            #    state_dict =  model.state_dict()
-            #    for k, v in state_dict.items():
-            #        state_dict[k] = v.cpu()
-            #    torch.save(state_dict, 'NN_normalized_spectra.pt')
+                state_dict =  model.state_dict()
+                for k, v in state_dict.items():
+                    state_dict[k] = v.cpu()
+                torch.save(state_dict, 'NN_normalized_spectra.pt')
 
-                #model_numpy = []
-                #for param in model.parameters():
-                #    model_numpy.append(param.data.cpu().numpy())
-
-            #    np.savez("training_loss.npz",\
-            #             training_loss = training_loss,\
-            #             validation_loss = validation_loss)
+                np.savez("training_loss.npz",\
+                         training_loss = training_loss,\
+                         validation_loss = validation_loss)
 
             # clear cache to save memory
             torch.cuda.empty_cache()
@@ -277,29 +282,9 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
             print('cached memory: {}'.format(torch.cuda.memory_cached() / 1024 ** 2))
 
 #--------------------------------------------------------------------------------------------
-    # extract the weights and biases
-    #w_array_0 = model_numpy[0]
-    #b_array_0 = model_numpy[1]
-    #w_array_1 = model_numpy[2]
-    #b_array_1 = model_numpy[3]
-    #w_array_2 = model_numpy[4]
-    #b_array_2 = model_numpy[5]
-
-    # save parameters and remember how we scaled the labels
-    #np.savez("NN_normalized_spectra.npz",\
-    #         w_array_0 = w_array_0,\
-    #         w_array_1 = w_array_1,\
-    #         w_array_2 = w_array_2,\
-    #         b_array_0 = b_array_0,\
-    #         b_array_1 = b_array_1,\
-    #         b_array_2 = b_array_2,\
-    #         x_max=x_max,\
-    #         x_min=x_min,\
-    #         training_loss = training_loss,\
-    #         validation_loss = validation_loss)
-
+    # save the final training loss
     np.savez("training_loss.npz",\
              training_loss = training_loss,\
              validation_loss = validation_loss)
 
-    return training_loss, validation_loss
+    return
