@@ -44,11 +44,14 @@ class Payne_model(torch.nn.Module):
 
         self.deconv1 = torch.nn.ConvTranspose1d(8, 64, mask_size, stride=2)
         self.deconv2 = torch.nn.ConvTranspose1d(64, 64, mask_size, stride=2)
+
         self.deconv3 = torch.nn.ConvTranspose1d(64, 64, mask_size, stride=2, padding=1)
         self.deconv4 = torch.nn.ConvTranspose1d(64, 64, mask_size, stride=2, padding=1)
         self.deconv5 = torch.nn.ConvTranspose1d(64, 64, mask_size, stride=2)
         self.deconv6 = torch.nn.ConvTranspose1d(64, 64, mask_size, stride=2, output_padding=1)
         self.deconv7 = torch.nn.ConvTranspose1d(64, 1, mask_size, stride=2)
+
+        self.deconv2b = torch.nn.ConvTranspose1d(64, 64, mask_size, stride=2)
 
         self.batch_norm1 = torch.nn.Sequential(
                             torch.nn.BatchNorm1d(64),
