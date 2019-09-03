@@ -44,9 +44,9 @@ class Payne_model(torch.nn.Module):
 
         self.deconv1 = torch.nn.ConvTranspose1d(8, 64, mask_size, stride=2)
         self.deconv2 = torch.nn.ConvTranspose1d(64, 64, mask_size, stride=2)
-        self.deconv3 = torch.nn.ConvTranspose1d(64, 128, mask_size, stride=2, padding=1)
-        self.deconv4 = torch.nn.ConvTranspose1d(128, 128, mask_size, stride=2, padding=1)
-        self.deconv5 = torch.nn.ConvTranspose1d(128, 64, mask_size, stride=2)
+        self.deconv3 = torch.nn.ConvTranspose1d(64, 64, mask_size, stride=2, padding=1)
+        self.deconv4 = torch.nn.ConvTranspose1d(64, 64, mask_size, stride=2, padding=1)
+        self.deconv5 = torch.nn.ConvTranspose1d(64, 64, mask_size, stride=2)
         self.deconv6 = torch.nn.ConvTranspose1d(64, 64, mask_size, stride=2, output_padding=1)
         self.deconv7 = torch.nn.ConvTranspose1d(64, 1, mask_size, stride=2)
 
@@ -79,23 +79,45 @@ class Payne_model(torch.nn.Module):
                             torch.nn.LeakyReLU()
         )
 
+        self.relu2 = torch.nn.LeakyReLU()
+        self.relu3 = torch.nn.LeakyReLU()
+        self.relu4 = torch.nn.LeakyReLU()
+        self.relu5 = torch.nn.LeakyReLU()
+        self.relu6 = torch.nn.LeakyReLU()
+
     def forward(self, x):
         x = self.features(x)[:,None,:]
         x = x.view(x.shape[0], 8, 52)
         x = self.deconv1(x)
-        x = self.batch_norm1(x)
-        x = self.deconv2(x)
-        x = self.batch_norm2(x)
-        x = self.deconv3(x)
-        x = self.batch_norm3(x)
-        x = self.deconv4(x)
-        x = self.batch_norm4(x)
-        x = self.deconv5(x)
-        x = self.batch_norm5(x)
-        x = self.deconv6(x)
-        x = self.batch_norm6(x)
-        x = self.deconv7(x)
-        x = self.batch_norm7(x)[:,0,:]
+        x1 = self.batch_norm1(x)
+
+        x2 = self.deconv2(x1)
+        x2 = self.batch_norm2(x2)
+        x2 += x1
+        x2 = self.relu2(x2)
+
+        x3 = self.deconv3(x2)
+        x3 = self.batch_norm3(x3)
+        x3 += x2
+        x3 = self.relu2(x3)
+
+        x4 = self.deconv4(x3)
+        x4 = self.batch_norm4(x4)
+        x4 += x3
+        x4 = self.relu2(x4)
+
+        x5 = self.deconv5(x4)
+        x5 = self.batch_norm5(x5)
+        x5 += x4
+        x5 = self.relu2(x5)
+
+        x6 = self.deconv6(x5)
+        x6 = self.batch_norm6(x6)
+        x6 += x5
+        x6 = self.relu2(x6)
+
+        x7 = self.deconv7(x6)
+        x7 = self.batch_norm7(x7)[:,0,:]
         return x
 
 
