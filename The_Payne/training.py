@@ -157,7 +157,7 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
     Here we consider a multilayer ResNet. [more detail soon]
 
     num_steps = how many steps to train until convergence.
-    1e5 is good for the specific NN architecture and learning I used by default,
+    1e4 is good for the specific NN architecture and learning I used by default,
     but bigger networks take more steps, and decreasing the learning rate will
     also change this. You can get a sense of how many steps are needed for a new
     NN architecture by plotting the loss function evaluated on both the training set
@@ -173,9 +173,7 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
     risk to stuck in a local minimum
 
     returns:
-        training loss and validation loss (per 1000 steps)
-        the codes also outputs a numpy saved array ""NN_normalized_spectra.npz"
-        which can be imported and substitutes the default neural networks (see tutorial)
+        training loss and validation loss
     '''
 
     # run on cuda
