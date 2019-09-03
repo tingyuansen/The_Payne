@@ -237,7 +237,7 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
         if e % 100 == 0:
 
             # randomly permute the data
-            perm_valid = torch.randperm(nsamples)
+            perm_valid = torch.randperm(nsamples_valid)
             perm_valid = perm_valid.cuda()
             loss_valid = 0
 
