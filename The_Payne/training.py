@@ -51,7 +51,26 @@ class Payne_model(torch.nn.Module):
         self.deconv6 = torch.nn.ConvTranspose1d(64, 64, mask_size, stride=2, output_padding=1)
         self.deconv7 = torch.nn.ConvTranspose1d(64, 1, mask_size, stride=2)
 
-        self.deconv2b = torch.nn.ConvTranspose1d(64, 64, mask_size, stride=2)
+        self.deconv2b = torch.nn.Sequential(
+                            torch.nn.ConvTranspose1d(64, 64, 1, stride=2),\
+                            torch.nn.BatchNorm1d(64)
+                        )
+        self.deconv3b = torch.nn.Sequential(
+                            torch.nn.ConvTranspose1d(64, 64, 1, stride=2, padding=1),\
+                            torch.nn.BatchNorm1d(64)
+                        )
+        self.deconv4b = torch.nn.Sequential(
+                            torch.nn.ConvTranspose1d(64, 64, 1, stride=2, padding=1),\
+                            torch.nn.BatchNorm1d(64)
+                        )
+        self.deconv5b = torch.nn.Sequential(
+                            torch.nn.ConvTranspose1d(64, 64, 1, stride=2),\
+                            torch.nn.BatchNorm1d(64)
+                        )
+        self.deconv6b = torch.nn.Sequential(
+                            torch.nn.ConvTranspose1d(64, 64, 1, stride=2, output_padding=1),\
+                            torch.nn.BatchNorm1d(64)
+                        )
 
         self.batch_norm1 = torch.nn.Sequential(
                             torch.nn.BatchNorm1d(64),
@@ -96,27 +115,27 @@ class Payne_model(torch.nn.Module):
 
         x2 = self.deconv2(x1)
         x2 = self.batch_norm2(x2)
-        x2 += x1
+        x2 += self.deconv2b(x1)
         x2 = self.relu2(x2)
 
         x3 = self.deconv3(x2)
         x3 = self.batch_norm3(x3)
-        x3 += x2
+        x3 += self.deconv3b(x2)
         x3 = self.relu2(x3)
 
         x4 = self.deconv4(x3)
         x4 = self.batch_norm4(x4)
-        x4 += x3
+        x4 += self.deconv4b(x3)
         x4 = self.relu2(x4)
 
         x5 = self.deconv5(x4)
         x5 = self.batch_norm5(x5)
-        x5 += x4
+        x5 += self.deconv5b(x4)
         x5 = self.relu2(x5)
 
         x6 = self.deconv6(x5)
         x6 = self.batch_norm6(x6)
-        x6 += x5
+        x6 += self.deconv6b(x5)
         x6 = self.relu2(x6)
 
         x7 = self.deconv7(x6)
