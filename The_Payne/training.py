@@ -235,38 +235,38 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
 
         # the average loss.
         if e % 100 == 0:
-            y_pred_valid = model(x_valid)
+            #y_pred_valid = model(x_valid)
 
             # adopt the nmf representation
             #y_nmf_valid = model(x_valid)
             #y_nmf_valid = (y_nmf_valid*std_nmf) + mu_nmf
             #y_pred_valid = torch.mm(y_nmf_valid, nmf_components)
 
-            loss_valid = loss_fn(y_pred_valid, y_valid)*1e4
-            print('iter %s:' % e, 'training loss = %.3f' % loss,\
-                 'validation loss = %.3f' % loss_valid)
+            #loss_valid = loss_fn(y_pred_valid, y_valid)*1e4
+            #print('iter %s:' % e, 'training loss = %.3f' % loss,\
+            #     'validation loss = %.3f' % loss_valid)
 
-            loss_data = loss.detach().data.item()
-            loss_valid_data = loss_valid.detach().data.item()
-            training_loss.append(loss_data)
-            validation_loss.append(loss_valid_data)
+            #loss_data = loss.detach().data.item()
+            #loss_valid_data = loss_valid.detach().data.item()
+            #training_loss.append(loss_data)
+            #validation_loss.append(loss_valid_data)
 
             # record the weights and biases if the validation loss improves
-            if loss_valid_data < current_loss:
-                current_loss = loss_valid_data
+            #if loss_valid_data < current_loss:
+            #    current_loss = loss_valid_data
 
-                state_dict =  model.state_dict()
-                for k, v in state_dict.items():
-                    state_dict[k] = v.cpu()
-                torch.save(state_dict, 'NN_normalized_spectra.pt')
+            #    state_dict =  model.state_dict()
+            #    for k, v in state_dict.items():
+            #        state_dict[k] = v.cpu()
+            #    torch.save(state_dict, 'NN_normalized_spectra.pt')
 
                 #model_numpy = []
                 #for param in model.parameters():
                 #    model_numpy.append(param.data.cpu().numpy())
 
-                np.savez("training_loss.npz",\
-                         training_loss = training_loss,\
-                         validation_loss = validation_loss)
+            #    np.savez("training_loss.npz",\
+            #             training_loss = training_loss,\
+            #             validation_loss = validation_loss)
 
             # clear cache to save memory
             torch.cuda.empty_cache()
