@@ -2,18 +2,9 @@
 This file is used to train the neural networks that predict the spectrum
 given any set of stellar labels (stellar parameters + elemental abundances).
 
-Note that, the approach here is slightly different from Ting+18. Instead of
-training individual small networks for each pixel separately, we train a single
-large network for all pixels simultaneously.
-
-The advantage of doing so is that individual pixels could exploit information
-from the adjacent pixel. This usually leads to more precise interpolations of
-spectral models.
-
-However to train a large network, GPUs are needed, and this code will
-only run with GPUs. But even for a simple, inexpensive, GPU (GTX 1060), this code
-should be pretty efficient -- for any grid of spectral models with 1000-10000
-training spectra and > 10 labels, it should not take more than a day to train
+Note that, the approach here is different from Ting+19. Instead of
+training individual small MLP networks for each pixel separately, we train a single
+large ResNet network for all pixels simultaneously.
 
 The default training set are synthetic spectra the Kurucz models and have been
 convolved to the appropriate R (~22500 for APOGEE) with the APOGEE LSF.
@@ -162,13 +153,8 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
 
     The training is designed in a way that it always returns the best neural networks
     before the networks start to overfit (gauged by the validation set).
-
-    num_neurons = number of neurons per hidden layer in the neural networks.
-    We assume a 2 hidden-layer neural network.
-    Increasing this number increases the complexity of the network. This could be helpful
-    in capturing a more subtle variation of flux as a function of stellar labels, but
-    increasing the complexity could also lead to overfitting. It is also slower
-    to train with a larger network.
+    
+    Here we consider a multilayer ResNet. [more detail soon]
 
     num_steps = how many steps to train until convergence.
     1e5 is good for the specific NN architecture and learning I used by default,
