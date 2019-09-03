@@ -59,11 +59,11 @@ class Payne_model(torch.nn.Module):
                             torch.nn.LeakyReLU()
         )
         self.batch_norm3 = torch.nn.Sequential(
-                            torch.nn.BatchNorm1d(128),
+                            torch.nn.BatchNorm1d(64),
                             torch.nn.LeakyReLU()
         )
         self.batch_norm4 = torch.nn.Sequential(
-                            torch.nn.BatchNorm1d(128),
+                            torch.nn.BatchNorm1d(64),
                             torch.nn.LeakyReLU()
         )
         self.batch_norm5 = torch.nn.Sequential(
@@ -181,7 +181,7 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
     x_valid = (validation_labels-x_min)/(x_max-x_min) - 0.5
 
     # save scaling relation
-    np.savez("NN_scaling.npz", x_min=x_min, x_max=x_max)
+    np.savez("NN_scaling_2.npz", x_min=x_min, x_max=x_max)
 
     # dimension of the input
     dim_in = x.shape[1]
@@ -289,9 +289,9 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
                 state_dict =  model.state_dict()
                 for k, v in state_dict.items():
                     state_dict[k] = v.cpu()
-                torch.save(state_dict, 'NN_normalized_spectra.pt')
+                torch.save(state_dict, 'NN_normalized_spectra_2.pt')
 
-                np.savez("training_loss.npz",\
+                np.savez("training_loss_2.npz",\
                          training_loss = training_loss,\
                          validation_loss = validation_loss)
 
@@ -305,7 +305,7 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
 
 #--------------------------------------------------------------------------------------------
     # save the final training loss
-    np.savez("training_loss.npz",\
+    np.savez("training_loss_2.npz",\
              training_loss = training_loss,\
              validation_loss = validation_loss)
 
