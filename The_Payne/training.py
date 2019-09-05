@@ -33,33 +33,32 @@ class Payne_model(torch.nn.Module):
             torch.nn.Linear(num_neurons, num_features),
         )
 
-        self.deconv1 = torch.nn.ConvTranspose1d(8, 64, mask_size, stride=2)
-        self.deconv2 = torch.nn.ConvTranspose1d(64, 64, mask_size, stride=2)
-
-        self.deconv3 = torch.nn.ConvTranspose1d(64, 64, mask_size, stride=2, padding=1)
-        self.deconv4 = torch.nn.ConvTranspose1d(64, 64, mask_size, stride=2, padding=1)
-        self.deconv5 = torch.nn.ConvTranspose1d(64, 64, mask_size, stride=2)
-        self.deconv6 = torch.nn.ConvTranspose1d(64, 64, mask_size, stride=2, output_padding=1)
-        self.deconv7 = torch.nn.ConvTranspose1d(64, 1, mask_size, stride=2)
+        self.deconv1 = torch.nn.ConvTranspose1d(8, 64, mask_size, stride=2, padding=5)
+        self.deconv2 = torch.nn.ConvTranspose1d(64, 64, mask_size, stride=2, padding=5)
+        self.deconv3 = torch.nn.ConvTranspose1d(64, 64, mask_size, stride=2, padding=5)
+        self.deconv4 = torch.nn.ConvTranspose1d(64, 64, mask_size, stride=2, padding=5)
+        self.deconv5 = torch.nn.ConvTranspose1d(64, 64, mask_size, stride=2, padding=5)
+        self.deconv6 = torch.nn.ConvTranspose1d(64, 64, mask_size, stride=2, padding=5)
+        self.deconv7 = torch.nn.ConvTranspose1d(64, 1, mask_size, stride=2, padding=5)
 
         self.deconv2b = torch.nn.Sequential(
-                            torch.nn.ConvTranspose1d(64, 64, 1, stride=2, output_padding=10),\
+                            torch.nn.ConvTranspose1d(64, 64, 1, stride=2),\
                             torch.nn.BatchNorm1d(64)
                         )
         self.deconv3b = torch.nn.Sequential(
-                            torch.nn.ConvTranspose1d(64, 64, 1, stride=2, padding=1, output_padding=10),\
+                            torch.nn.ConvTranspose1d(64, 64, 1, stride=2),\
                             torch.nn.BatchNorm1d(64)
                         )
         self.deconv4b = torch.nn.Sequential(
-                            torch.nn.ConvTranspose1d(64, 64, 1, stride=2, padding=1, output_padding=10),\
+                            torch.nn.ConvTranspose1d(64, 64, 1, stride=2),\
                             torch.nn.BatchNorm1d(64)
                         )
         self.deconv5b = torch.nn.Sequential(
-                            torch.nn.ConvTranspose1d(64, 64, 1, stride=2, output_padding=10),\
+                            torch.nn.ConvTranspose1d(64, 64, 1, stride=2),\
                             torch.nn.BatchNorm1d(64)
                         )
         self.deconv6b = torch.nn.Sequential(
-                            torch.nn.ConvTranspose1d(64, 64, 1, stride=2, output_padding=11),\
+                            torch.nn.ConvTranspose1d(64, 64, 1, stride=2),\
                             torch.nn.BatchNorm1d(64)
                         )
 
@@ -100,7 +99,7 @@ class Payne_model(torch.nn.Module):
 
     def forward(self, x):
         x = self.features(x)[:,None,:]
-        x = x.view(x.shape[0], 8, 52)
+        x = x.view(x.shape[0], 8, 62)
         x = self.deconv1(x)
         x1 = self.batch_norm1(x)
 
@@ -116,7 +115,7 @@ class Payne_model(torch.nn.Module):
 
         x4 = self.deconv4(x3)
         x4 = self.batch_norm4(x4)
-        x4 += self.deconv4b(x3)
+        #x4 += self.deconv4b(x3)
         x4 = self.relu2(x4)
 
         x5 = self.deconv5(x4)
@@ -130,15 +129,15 @@ class Payne_model(torch.nn.Module):
         x6 = self.relu2(x6)
 
         x7 = self.deconv7(x6)
-        x7 = self.batch_norm7(x7)[:,0,:]
-        return x
+        x7 = self.batch_norm7(x7)[:,0,:7753]
+        return x7
 
 
 #===================================================================================================
 # train neural networks
 def neural_net(training_labels, training_spectra, validation_labels, validation_spectra,\
              num_neurons = 300, num_steps=1e4, learning_rate=1e-4, batch_size=512,\
-             num_features = 280, mask_size=11):
+             num_features = 496, mask_size=11):
 
     '''
     Training neural networks to emulate spectral models
@@ -153,7 +152,7 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
 
     The training is designed in a way that it always returns the best neural networks
     before the networks start to overfit (gauged by the validation set).
-    
+
     Here we consider a multilayer ResNet. [more detail soon]
 
     num_steps = how many steps to train until convergence.
