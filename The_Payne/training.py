@@ -136,7 +136,7 @@ class Payne_model(torch.nn.Module):
 #===================================================================================================
 # train neural networks
 def neural_net(training_labels, training_spectra, validation_labels, validation_spectra,\
-             num_neurons = 300, num_steps=2e4, learning_rate=1e-4, batch_size=512,\
+             num_neurons = 300, num_steps=2e4, learning_rate=1e-4, batch_size=128,\
              num_features = 496, mask_size=11):
 
     '''
