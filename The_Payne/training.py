@@ -115,7 +115,7 @@ class Payne_model(torch.nn.Module):
 
         x4 = self.deconv4(x3)
         x4 = self.batch_norm4(x4)
-        #x4 += self.deconv4b(x3)
+        x4 += self.deconv4b(x3)
         x4 = self.relu2(x4)
 
         x5 = self.deconv5(x4)
