@@ -96,6 +96,7 @@ class Payne_model(torch.nn.Module):
         self.relu4 = torch.nn.LeakyReLU()
         self.relu5 = torch.nn.LeakyReLU()
         self.relu6 = torch.nn.LeakyReLU()
+        self.num_pixel = num_pixel
 
     def forward(self, x):
         x = self.features(x)[:,None,:]
@@ -129,7 +130,7 @@ class Payne_model(torch.nn.Module):
         x6 = self.relu2(x6)
 
         x7 = self.deconv7(x6)
-        x7 = self.batch_norm7(x7)[:,0,:num_pixel]
+        x7 = self.batch_norm7(x7)[:,0,:self.um_pixel]
         return x7
 
 #===================================================================================================
