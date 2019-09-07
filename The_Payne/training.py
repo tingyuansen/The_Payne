@@ -33,7 +33,7 @@ class Payne_model(torch.nn.Module):
             torch.nn.Linear(num_neurons, num_features),
         )
 
-        self.deconv1 = torch.nn.ConvTranspose1d(128, 64, mask_size, stride=3, padding=5)
+        self.deconv1 = torch.nn.ConvTranspose1d(64, 64, mask_size, stride=3, padding=5)
         self.deconv2 = torch.nn.ConvTranspose1d(64, 64, mask_size, stride=3, padding=5)
         self.deconv3 = torch.nn.ConvTranspose1d(64, 64, mask_size, stride=3, padding=5)
         self.deconv4 = torch.nn.ConvTranspose1d(64, 64, mask_size, stride=3, padding=5)
@@ -100,7 +100,7 @@ class Payne_model(torch.nn.Module):
 
     def forward(self, x):
         x = self.features(x)[:,None,:]
-        x = x.view(x.shape[0], 128, 5)
+        x = x.view(x.shape[0], 64, 5)
         x = self.deconv1(x)
         x1 = self.batch_norm1(x)
 
