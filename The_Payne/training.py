@@ -38,8 +38,8 @@ class Payne_model(torch.nn.Module):
         self.deconv3 = torch.nn.ConvTranspose1d(64, 64, mask_size, stride=3, padding=5)
         self.deconv4 = torch.nn.ConvTranspose1d(64, 64, mask_size, stride=3, padding=5)
         self.deconv5 = torch.nn.ConvTranspose1d(64, 64, mask_size, stride=3, padding=5)
-        self.deconv6 = torch.nn.ConvTranspose1d(64, 64, mask_size, stride=3, padding=5)
-        self.deconv7 = torch.nn.ConvTranspose1d(64, 1, mask_size, stride=3, padding=5)
+        self.deconv6 = torch.nn.ConvTranspose1d(64, 32, mask_size, stride=3, padding=5)
+        self.deconv7 = torch.nn.ConvTranspose1d(32, 1, mask_size, stride=3, padding=5)
 
         self.deconv2b = torch.nn.Sequential(
                             torch.nn.ConvTranspose1d(64, 64, 1, stride=3),\
@@ -58,8 +58,8 @@ class Payne_model(torch.nn.Module):
                             torch.nn.BatchNorm1d(64)
                         )
         self.deconv6b = torch.nn.Sequential(
-                            torch.nn.ConvTranspose1d(64, 64, 1, stride=3),\
-                            torch.nn.BatchNorm1d(64)
+                            torch.nn.ConvTranspose1d(64, 32, 1, stride=3),\
+                            torch.nn.BatchNorm1d(32)
                         )
 
         self.batch_norm1 = torch.nn.Sequential(
@@ -83,7 +83,7 @@ class Payne_model(torch.nn.Module):
                             torch.nn.LeakyReLU()
         )
         self.batch_norm6 = torch.nn.Sequential(
-                            torch.nn.BatchNorm1d(64),
+                            torch.nn.BatchNorm1d(32),
                             torch.nn.LeakyReLU()
         )
         self.batch_norm7 = torch.nn.Sequential(
