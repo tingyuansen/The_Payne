@@ -23,7 +23,7 @@ from . import radam
 #===================================================================================================
 # define container
 class Payne_model(torch.nn.Module):
-    def __init__(self, dim_in, num_neurons, num_features, mask_size):
+    def __init__(self, dim_in, num_neurons, num_features, mask_size, num_pixel):
         super(Payne_model, self).__init__()
         self.features = torch.nn.Sequential(
             torch.nn.Linear(dim_in, num_neurons),
@@ -129,14 +129,14 @@ class Payne_model(torch.nn.Module):
         x6 = self.relu2(x6)
 
         x7 = self.deconv7(x6)
-        x7 = self.batch_norm7(x7)[:,0,:7753]
+        x7 = self.batch_norm7(x7)[:,0,:num_pixel]
         return x7
 
 #===================================================================================================
 # train neural networks
 def neural_net(training_labels, training_spectra, validation_labels, validation_spectra,\
              num_neurons = 300, num_steps=2e4, learning_rate=1e-4, batch_size=64,\
-             num_features = 128*5, mask_size=11):
+             num_features = 128*5, mask_size=11, num_pixel=7214):
 
     '''
     Training neural networks to emulate spectral models
