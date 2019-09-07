@@ -209,7 +209,7 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
     y_valid = Variable(torch.from_numpy(validation_spectra), requires_grad=False).type(dtype)
 
     # initiate Payne and optimizer
-    model = Payne_model(dim_in, num_neurons, num_features, mask_size)
+    model = Payne_model(dim_in, num_neurons, num_features, mask_size, num_pixel)
     model.cuda()
     model.train()
 
