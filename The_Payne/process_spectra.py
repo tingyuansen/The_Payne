@@ -1,10 +1,10 @@
 '''
 Code for reading in combined spectra.
-Any way that you can get your hands on the spectra should be fine
+Any way that you can get your hands on the spectra should be fine.
 
 Here we adopt APOGEE DR14. Edit os.environs below for a later version of the APOGEE data release.
 Since our spectral model training set was normalized using the DR12 wavelength definition,
-even thought the spectra are from DR14, we will resample them into the DR12 wavelength format.
+We will resample spectra into the DR12 wavelength format.
 '''
 
 from __future__ import absolute_import, division, print_function # python2 compatibility
