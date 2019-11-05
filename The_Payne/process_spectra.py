@@ -1,10 +1,10 @@
 '''
 Code for reading in combined spectra.
-Any way that you can get your hands on the spectra should be fine, as long as you 
+Any way that you can get your hands on the spectra should be fine
 
-Here we adopt APOGEE DR14. Edit os.environs below for a later version of APOGEE data release.
-Since our spectral model training set was normalized using the DR12 wavelength definition, 
-even thought the spectra are from DR14, we will resample them into DR12 wavelength format.
+Here we adopt APOGEE DR14. Edit os.environs below for a later version of the APOGEE data release.
+Since our spectral model training set was normalized using the DR12 wavelength definition,
+even thought the spectra are from DR14, we will resample them into the DR12 wavelength format.
 '''
 
 from __future__ import absolute_import, division, print_function # python2 compatibility
@@ -13,12 +13,12 @@ import sys
 import os
 import subprocess
 import astropy.io.fits as pyfits
-    
+
 from . import utils
 from . import spectral_model
 
 # dr14
-master_path = "data.sdss3.org/sas/dr14/apogee/spectro/redux/r8/stars/" 
+master_path = "data.sdss3.org/sas/dr14/apogee/spectro/redux/r8/stars/"
 catalog_path = "l31c/l31c.2/"
 catalog_name = "allStar-l31c.2.fits"
 
@@ -30,11 +30,11 @@ cont_pixels = utils.load_cannon_contpixels()
 
 def read_apogee_catalog():
     '''
-    read in the catalog of info for all stars in a data release. 
+    read in the catalog of info for all stars in a data release.
     '''
     filepath = os.path.join(master_path, catalog_path, catalog_name)  # dr14
     filename = os.path.join(download_path, catalog_name)
-    
+
     try:
         os.makedirs(os.path.dirname(download_path))
     except OSError: pass
@@ -52,15 +52,15 @@ def get_combined_spectrum_single_object(apogee_id, catalog = None, save_local = 
     '''
     apogee_id should be a byte-like object; i.e b'2M13012770+5754582'
     This downloads a single combined spectrum and the associated error array,
-        and it normalizes both. 
+        and it normalizes both.
     '''
-    
+
     # read in the allStar catalog if you haven't already
     if catalog is None:
         catalog, catalog_id = read_apogee_catalog()
-    
+
     _COMBINED_INDEX = 1
-    
+
     msk = np.where(catalog_id == apogee_id)[0]
     if not len(msk):
         raise ValueError('the desired Apogee ID was not found in the allStar catalog.')
@@ -86,7 +86,7 @@ def get_combined_spectrum_single_object(apogee_id, catalog = None, save_local = 
     temp1 = pyfits.getdata(filename, ext = 1, header = False)
     temp2 = pyfits.getdata(filename, ext = 2, header = False)
     temp3 = pyfits.getdata(filename, ext = 3, header = False)
-    
+
     if temp1.shape[0] > 6000:
         spec = temp1
         specerr = temp2
@@ -96,40 +96,32 @@ def get_combined_spectrum_single_object(apogee_id, catalog = None, save_local = 
         specerr = temp2[_COMBINED_INDEX]
         mask = temp3[_COMBINED_INDEX]
 
-    # Inflate uncertainties for bad pixels    
-    #specerr[mask != 0] += 100*np.median(spec[np.isfinite(spec)])
-
-    # Inflate pixels with high SNR to 0.5
-    #highsnr = spec/specerr > 200.
-    #specerr[highsnr] = 0.005*np.fabs(spec[highsnr])
-    
-    # convert ApStar grid to Aspcap grid
+    # convert the ApStar grid into the ASPCAP grid
     spec = toAspcapGrid(spec) # dr12 wavelength format
     specerr = toAspcapGrid(specerr)
-    
+
     # cull dead pixels
     choose = spec <= 0
     spec[choose] = 0.01
     specerr[choose] = np.max(np.abs(spec))*999.
-        
+
     # continuum-normalize
-    cont = utils.get_apogee_continuum(spec = spec, 
+    cont = utils.get_apogee_continuum(spec = spec,
         spec_err = specerr, cont_pixels = cont_pixels)
     spec /= cont
     specerr /= cont
-    
+
     if save_local:
         np.savez(download_path + 'spectrum_ap_id_' + str(apogee_id) + '_.npz',
                  spectrum = spec, spec_err = specerr)
     return spec, specerr
-    
+
 
 def toAspcapGrid(spec):
     """
-    Convert a spectrum from apStar grid to the ASPCAP grid (w/o the detector gaps)
-    Adapted from Jo Bovy's APOGEE package
+    Convert a spectrum from the apStar grid to the ASPCAP grid (w/o the detector gaps)
     """
-    
+
     apStarBlu_lo,apStarBlu_hi,apStarGre_lo,apStarGre_hi,apStarRed_lo,apStarRed_hi \
         = 322, 3242, 3648, 6048, 6412, 8306 # dr12
     aspcapBlu_start = 0
@@ -138,7 +130,7 @@ def toAspcapGrid(spec):
     aspcapTotal = apStarRed_hi-apStarRed_lo+aspcapRed_start
 
     out= np.zeros(aspcapTotal,dtype=spec.dtype)
-    
+
     out[:aspcapGre_start]= spec[apStarBlu_lo:apStarBlu_hi]
     out[aspcapGre_start:aspcapRed_start]= spec[apStarGre_lo:apStarGre_hi]
     out[aspcapRed_start:]= spec[apStarRed_lo:apStarRed_hi]
