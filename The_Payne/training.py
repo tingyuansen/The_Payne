@@ -1,17 +1,20 @@
 '''
-This file is used to train the neural networks that predict the spectrum
+This file is used to train the neural net that predicts the spectrum
 given any set of stellar labels (stellar parameters + elemental abundances).
 
-Note that, the approach here is different from Ting+19. Instead of
-training individual small networks for each pixel separately, we train a single
+Note that, the approach here is slightly different from Ting+19. Instead of
+training individual small networks for each pixel separately, here we train a single
 large network for all pixels simultaneously.
 
-We found that for most cases, a simple multilayer perceptron model (only dense layers)
-works sufficiently well. But here we also provide the option to run a large deconvolutional
-ResNet. In the case where the parameter space spanned is large, ResNet can provide better
-emulation.
+The advantage of doing so is that individual pixels will exploit information
+from adjacent pixels. This usually leads to more precise interpolations.
 
-The default training set are synthetic spectra the Kurucz models and have been
+However to train a large network, GPU is needed. This code will
+only run with GPU. But even with an inexpensive GPU, this code
+should be pretty efficient -- training with a grid of 10,000 training spectra,
+with > 10 labels, should not take more than a few hours
+
+The default training set are the Kurucz synthetic spectral models and have been
 convolved to the appropriate R (~22500 for APOGEE) with the APOGEE LSF.
 '''
 
@@ -109,29 +112,29 @@ class Payne_model(torch.nn.Module):
 #===================================================================================================
 # train neural networks
 def neural_net(training_labels, training_spectra, validation_labels, validation_spectra,\
-             num_neurons = 300, num_steps=1e5, learning_rate=1e-4, batch_size=512,\
+             num_neurons = 300, num_steps=1e4, learning_rate=1e-4, batch_size=512,\
              num_features = 64*5, mask_size=11, num_pixel=7214):
 
     '''
-    Training neural networks to emulate spectral models
+    Training a neural net to emulate spectral models
 
     training_labels has the dimension of [# training spectra, # stellar labels]
     training_spectra has the dimension of [# training spectra, # wavelength pixels]
 
-    The validation set is used to independently evaluate how well the neural networks
-    are emulating the spectra. If the networks overfit the spectral variation, while
-    the loss function will continue to improve for the training set, but the validation
-    set should show a worsen loss function.
+    The validation set is used to independently evaluate how well the neural net
+    is emulating the spectra. If the neural network overfits the spectral variation, while
+    the loss will continue to improve for the training set, but the validation
+    set should show a worsen loss.
 
-    The training is designed in a way that it always returns the best neural networks
-    before the networks start to overfit (gauged by the validation set).
+    The training is designed in a way that it always returns the best neural net
+    before the network starts to overfit (gauged by the validation set).
 
     num_steps = how many steps to train until convergence.
-    1e5 is good for the specific NN architecture and learning I used by default,
-    but bigger networks take more steps, and decreasing the learning rate will
-    also change this. You can get a sense of how many steps are needed for a new
-    NN architecture by plotting the loss function evaluated on both the training set
-    and a validation set as a function of step number. It should plateau once the NN
+    1e4 is good for the specific NN architecture and learning I used by default.
+    Bigger networks will take more steps to converge, and decreasing the learning rate
+    will also change this. You can get a sense of how many steps are needed for a new
+    NN architecture by plotting the loss evaluated on both the training set and
+    a validation set as a function of step number. It should plateau once the NN
     has converged.
 
     learning_rate = step size to take for gradient descent
@@ -146,11 +149,9 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
     tweak the ResNet model accordingly
 
     batch_size = the batch size for training the neural networks during the stochastic
-    gradient descent. A larger batch_size reduces the stochasticity, but it might also
-    risk to stuck in a local minimum
+    gradient descent. A larger batch_size reduces stochasticity, but it might also
+    risk of stucking in local minima
 
-    returns:
-        training loss and validation loss
     '''
 
     # run on cuda
@@ -163,14 +164,11 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
     x = (training_labels - x_min)/(x_max - x_min) - 0.5
     x_valid = (validation_labels-x_min)/(x_max-x_min) - 0.5
 
-    # save scaling relation
-    np.savez("NN_scaling.npz", x_min=x_min, x_max=x_max)
-
     # dimension of the input
     dim_in = x.shape[1]
 
 #--------------------------------------------------------------------------------------------
-    # assume L2 loss
+    # assume L1 loss
     loss_fn = torch.nn.L1Loss(reduction = 'mean')
 
     # make pytorch variables
@@ -188,7 +186,7 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
     optimizer = radam.RAdam([p for p in model.parameters() if p.requires_grad==True], lr=learning_rate)
 
 #--------------------------------------------------------------------------------------------
-    # break into batches
+    # train in batches
     nsamples = x.shape[0]
     nbatches = nsamples // batch_size
 
@@ -218,10 +216,12 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
             loss.backward(retain_graph=False)
             optimizer.step()
 
-        # the average loss
+#-------------------------------------------------------------------------------------------------------
+        # evaluate validation loss
         if e % 100 == 0:
 
-            # randomly permute the data
+            # here we also break into batches because when training ResNet
+            # evaluating the whole validation set could go beyond the GPU memory
             perm_valid = torch.randperm(nsamples_valid)
             perm_valid = perm_valid.cuda()
             loss_valid = 0
@@ -244,16 +244,30 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
             if loss_valid_data < current_loss:
                 current_loss = loss_valid_data
 
-                state_dict =  model.state_dict()
-                for k, v in state_dict.items():
-                    state_dict[k] = v.cpu()
-                torch.save(state_dict, 'NN_normalized_spectra.pt')
-
-                np.savez("training_loss.npz",\
-                         training_loss = training_loss,\
-                         validation_loss = validation_loss)
+                model_numpy = []
+                for param in model.parameters():
+                    model_numpy.append(param.data.cpu().numpy())
 
 #--------------------------------------------------------------------------------------------
+    # extract the weights and biases
+    w_array_0 = model_numpy[0]
+    b_array_0 = model_numpy[1]
+    w_array_1 = model_numpy[2]
+    b_array_1 = model_numpy[3]
+    w_array_2 = model_numpy[4]
+    b_array_2 = model_numpy[5]
+
+    # save parameters and remember how we scaled the labels
+    np.savez("NN_normalized_spectra.npz",\
+             w_array_0 = w_array_0,\
+             w_array_1 = w_array_1,\
+             w_array_2 = w_array_2,\
+             b_array_0 = b_array_0,\
+             b_array_1 = b_array_1,\
+             b_array_2 = b_array_2,\
+             x_max=x_max,\
+             x_min=x_min,)
+
     # save the final training loss
     np.savez("training_loss.npz",\
              training_loss = training_loss,\
