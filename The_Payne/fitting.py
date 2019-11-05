@@ -34,7 +34,7 @@ def fit_normalized_spectrum_single_star_model(norm_spec, spec_err, NN_coeffs, wa
 
     # assuming a neural net that has two hidden layers.
     w_array_0, w_array_1, w_array_2, b_array_0, b_array_1, b_array_2, x_min, x_max = NN_coeffs
-
+    
     # number of labels + radial velocity
     num_labels = w_array_0.shape[-1] + 1
 
