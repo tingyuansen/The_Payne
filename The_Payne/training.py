@@ -222,6 +222,7 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
 
             # here we also break into batches because when training ResNet
             # evaluating the whole validation set could go beyond the GPU memory
+            # if needed, this part can be simplified to reduce overhead
             perm_valid = torch.randperm(nsamples_valid)
             perm_valid = perm_valid.cuda()
             loss_valid = 0
@@ -240,6 +241,7 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
             training_loss.append(loss_data)
             validation_loss.append(loss_valid_data)
 
+#--------------------------------------------------------------------------------------------
             # record the weights and biases if the validation loss improves
             if loss_valid_data < current_loss:
                 current_loss = loss_valid_data
