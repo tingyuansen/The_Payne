@@ -245,7 +245,6 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
             # record the weights and biases if the validation loss improves
             if loss_valid_data < current_loss:
                 current_loss = loss_valid_data
-                print('yes')
                 model_numpy = []
                 for param in model.parameters():
                     model_numpy.append(param.data.cpu().numpy())
