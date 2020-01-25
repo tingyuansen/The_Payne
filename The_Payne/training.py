@@ -30,23 +30,22 @@ from . import radam
 
 #===================================================================================================
 # simple multi-layer perceptron model
-class Payne_model(torch.nn.Module):
-    def __init__(self, dim_in, num_neurons, num_features, mask_size, num_pixel):
-        super(Payne_model, self).__init__()
-        self.features = torch.nn.Sequential(
-            torch.nn.Linear(dim_in, num_neurons),
-            torch.nn.LeakyReLU(),
-            torch.nn.Linear(num_neurons, num_neurons),
-            torch.nn.LeakyReLU(),
-            torch.nn.Linear(num_neurons, num_pixel),
-        )
-
-    def forward(self, x):
-        return self.features(x)
+# class Payne_model(torch.nn.Module):
+#     def __init__(self, dim_in, num_neurons, num_features, mask_size, num_pixel):
+#         super(Payne_model, self).__init__()
+#         self.features = torch.nn.Sequential(
+#             torch.nn.Linear(dim_in, num_neurons),
+#             torch.nn.LeakyReLU(),
+#             torch.nn.Linear(num_neurons, num_neurons),
+#             torch.nn.LeakyReLU(),
+#             torch.nn.Linear(num_neurons, num_pixel),
+#         )
+#
+#     def forward(self, x):
+#         return self.features(x)
 
 #---------------------------------------------------------------------------------------------------
 # resnet models
-'''
 class Payne_model(torch.nn.Module):
     def __init__(self, dim_in, num_neurons, num_features, mask_size, num_pixel):
         super(Payne_model, self).__init__()
@@ -82,7 +81,7 @@ class Payne_model(torch.nn.Module):
 
     def forward(self, x):
         x = self.features(x)[:,None,:]
-        x = x.view(x.shape[0], 64, 5)
+        x = x.view(x.shape[0], 64, 3)
         x1 = self.deconv1(x)
 
         x2 = self.deconv2(x1)
@@ -107,13 +106,13 @@ class Payne_model(torch.nn.Module):
 
         x7 = self.deconv7(x6)[:,0,:self.num_pixel]
         return x7
-'''
+
 
 #===================================================================================================
 # train neural networks
 def neural_net(training_labels, training_spectra, validation_labels, validation_spectra,\
              num_neurons = 300, num_steps=1e4, learning_rate=1e-4, batch_size=512,\
-             num_features = 64*5, mask_size=11, num_pixel=7214):
+             num_features = 64*3, mask_size=11, num_pixel=4375):
 
     '''
     Training a neural net to emulate spectral models
@@ -245,29 +244,40 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
             # record the weights and biases if the validation loss improves
             if loss_valid_data < current_loss:
                 current_loss = loss_valid_data
-                model_numpy = []
-                for param in model.parameters():
-                    model_numpy.append(param.data.cpu().numpy())
+
+                # model_numpy = []
+                # for param in model.parameters():
+                #     model_numpy.append(param.data.cpu().numpy())
+
+                ### for resnet ###
+                state_dict =  model.state_dict()
+                for k, v in state_dict.items():
+                    state_dict[k] = v.cpu()
+                torch.save(state_dict, 'NN_normalized_spectra.pt')
+
+                np.savez("training_loss.npz",\
+                        training_loss = training_loss,\
+                        validation_loss = validation_loss)
 
 #--------------------------------------------------------------------------------------------
-    # extract the weights and biases
-    w_array_0 = model_numpy[0]
-    b_array_0 = model_numpy[1]
-    w_array_1 = model_numpy[2]
-    b_array_1 = model_numpy[3]
-    w_array_2 = model_numpy[4]
-    b_array_2 = model_numpy[5]
-
-    # save parameters and remember how we scaled the labels
-    np.savez("NN_normalized_spectra.npz",\
-             w_array_0 = w_array_0,\
-             w_array_1 = w_array_1,\
-             w_array_2 = w_array_2,\
-             b_array_0 = b_array_0,\
-             b_array_1 = b_array_1,\
-             b_array_2 = b_array_2,\
-             x_max=x_max,\
-             x_min=x_min,)
+    # # extract the weights and biases
+    # w_array_0 = model_numpy[0]
+    # b_array_0 = model_numpy[1]
+    # w_array_1 = model_numpy[2]
+    # b_array_1 = model_numpy[3]
+    # w_array_2 = model_numpy[4]
+    # b_array_2 = model_numpy[5]
+    #
+    # # save parameters and remember how we scaled the labels
+    # np.savez("NN_normalized_spectra.npz",\
+    #          w_array_0 = w_array_0,\
+    #          w_array_1 = w_array_1,\
+    #          w_array_2 = w_array_2,\
+    #          b_array_0 = b_array_0,\
+    #          b_array_1 = b_array_1,\
+    #          b_array_2 = b_array_2,\
+    #          x_max=x_max,\
+    #          x_min=x_min,)
 
     # save the final training loss
     np.savez("training_loss.npz",\
