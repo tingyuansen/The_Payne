@@ -138,7 +138,7 @@ class Payne_model(nn.Module):
         self.add_module("model", self.model)
 
     def forward(self, z):
-        return self.model(z[:,:,None]).view(-1,6097)
+        return self.model(z[:,:,None])[:,0,:6097]
 
 
 #===================================================================================================
