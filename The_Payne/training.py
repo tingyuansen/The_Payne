@@ -111,9 +111,8 @@ from . import radam
 #---------------------------------------------------------------------------------------------------
 # define network
 class Payne_model(nn.Module):
-    def __init__(self, dim_in, num_pixel):
+    def __init__(self, dim_in, num_neurons, num_features, mask_size, num_pixel):
         super(Payne_model, self).__init__()
-        self.z_dim = dim_in
         layers = []
         channel = 256
 
@@ -121,7 +120,7 @@ class Payne_model(nn.Module):
             for j in range(2):
 
                 if i == 0 and j == 0:
-                    layers.append(torch.nn.ConvTranspose1d(z_dim, channel, 7, stride=1))
+                    layers.append(torch.nn.ConvTranspose1d(dim_in, channel, 7, stride=1))
                     layers.append(torch.nn.BatchNorm1d(channel, momentum=0.001, affine=False))
                     layers.append(torch.nn.LeakyReLU(0.2, inplace=True))
                 else:
@@ -139,7 +138,7 @@ class Payne_model(nn.Module):
         self.add_module("model", self.model)
 
     def forward(self, z):
-        return self.model(z).view(-1,7163)
+        return self.model(z[:,:,None]).view(-1,6097)
 
 
 #===================================================================================================
