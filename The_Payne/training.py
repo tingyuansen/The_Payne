@@ -249,6 +249,25 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
                 for param in model.parameters():
                     model_numpy.append(param.data.cpu().numpy())
 
+                # extract the weights and biases
+                w_array_0 = model_numpy[0]
+                b_array_0 = model_numpy[1]
+                w_array_1 = model_numpy[2]
+                b_array_1 = model_numpy[3]
+                w_array_2 = model_numpy[4]
+                b_array_2 = model_numpy[5]
+
+                # save parameters and remember how we scaled the labels
+                np.savez("NN_normalized_spectra.npz",\
+                        w_array_0 = w_array_0,\
+                        w_array_1 = w_array_1,\
+                        w_array_2 = w_array_2,\
+                        b_array_0 = b_array_0,\
+                        b_array_1 = b_array_1,\
+                        b_array_2 = b_array_2,\
+                        x_max=x_max,\
+                        x_min=x_min,)
+
 #--------------------------------------------------------------------------------------------
     # extract the weights and biases
     w_array_0 = model_numpy[0]
