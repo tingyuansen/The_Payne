@@ -110,7 +110,7 @@ from . import radam
 
 #---------------------------------------------------------------------------------------------------
 # define network
-class Payne_model(nn.Module):
+class Payne_model(torch.nn.Module):
     def __init__(self, dim_in, num_neurons, num_features, mask_size, num_pixel):
         super(Payne_model, self).__init__()
         layers = []
