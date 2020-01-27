@@ -268,6 +268,11 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
                         x_max=x_max,\
                         x_min=x_min,)
 
+                # save the training loss
+                np.savez("training_loss.npz",\
+                         training_loss = training_loss,\
+                         validation_loss = validation_loss)
+
 #--------------------------------------------------------------------------------------------
     # extract the weights and biases
     w_array_0 = model_numpy[0]
