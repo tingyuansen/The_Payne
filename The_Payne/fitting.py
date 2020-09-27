@@ -23,7 +23,7 @@ def fit_normalized_spectrum_single_star_model(norm_spec, spec_err, NN_coeffs, wa
 
     returns:
         popt: the best-fit labels
-        pcov: the covariance matrix, from which you can get formal fitting uncertainties
+        pstd: the formal fitting uncertainties
         model_spec: the model spectrum corresponding to popt
     '''
 
@@ -34,7 +34,7 @@ def fit_normalized_spectrum_single_star_model(norm_spec, spec_err, NN_coeffs, wa
 
     # assuming a neural net that has two hidden layers.
     w_array_0, w_array_1, w_array_2, b_array_0, b_array_1, b_array_2, x_min, x_max = NN_coeffs
-    
+
     # number of labels + radial velocity
     num_labels = w_array_0.shape[-1] + 1
 
@@ -58,9 +58,10 @@ def fit_normalized_spectrum_single_star_model(norm_spec, spec_err, NN_coeffs, wa
     # run the optimizer
     popt, pcov = curve_fit(fit_func, xdata=[], ydata = norm_spec, sigma = spec_err, p0 = p0,
                 bounds = bounds, ftol = tol, xtol = tol, absolute_sigma = True, method = 'trf')
+    pstd = np.sqrt(np.diag(pcov))
     model_spec = fit_func([], *popt)
 
     # rescale the result back to original unit
     popt[:-1] = (popt[:-1]+0.5)*(x_max-x_min) + x_min
-    pcov[:-1,:-1] = pcov[:-1,:-1]*(x_max-x_min)
-    return popt, pcov, model_spec
+    pstd[:-1] = pstd[:-1]*(x_max-x_min)
+    return popt, pstd, model_spec
