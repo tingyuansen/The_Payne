@@ -12,7 +12,7 @@ from adjacent pixels. This usually leads to more precise interpolations.
 However to train a large network, GPU is needed. This code will
 only run with GPU. But even with an inexpensive GPU, this code
 should be pretty efficient -- training with a grid of 10,000 training spectra,
-with > 10 labels, should not take more than a few hours
+with > 10 labels, should not take more than an hour or so.
 
 The default training set are the Kurucz synthetic spectral models and have been
 convolved to the appropriate R (~22500 for APOGEE) with the APOGEE LSF.
@@ -151,7 +151,7 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
     batch_size = the batch size for training the neural networks during the stochastic
     gradient descent. A larger batch_size reduces stochasticity, but it might also
     risk of stucking in local minima
-
+    
     '''
 
     # run on cuda

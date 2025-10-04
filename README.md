@@ -241,9 +241,7 @@ fitted_labels, uncertainties, model_spectrum = fitter.fit_spectrum(
 
 ### Additional Examples
 
-For complete working examples, see:
-- `examples/quick_start.py` - Three complete examples with synthetic data
-- `tutorial.ipynb` - Jupyter notebook with detailed workflows
+See `tutorial.ipynb` - Jupyter notebook with detailed workflows
 
 ## Typical Workflow
 
