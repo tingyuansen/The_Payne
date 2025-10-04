@@ -156,7 +156,8 @@ def neural_net(training_labels, training_spectra, validation_labels, validation_
 
     # run on cuda
     dtype = torch.cuda.FloatTensor
-    torch.set_default_tensor_type('torch.cuda.FloatTensor')
+    torch.set_default_dtype(torch.float32)
+    torch.set_default_device('cuda')
 
     # scale the labels, optimizing neural networks is easier if the labels are more normalized
     x_max = np.max(training_labels, axis = 0)

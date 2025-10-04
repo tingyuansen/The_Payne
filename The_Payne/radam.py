@@ -67,14 +67,14 @@ class RAdam(Optimizer):
                     buffered[2] = step_size
 
                 if group['weight_decay'] != 0:
-                    p_data_fp32.add_(-group['weight_decay'] * group['lr'], p_data_fp32)
+                    p_data_fp32.add_(p_data_fp32, alpha=-group['weight_decay'] * group['lr'])
 
                 # more conservative since it's an approximated value
                 if N_sma >= 5:
                     denom = exp_avg_sq.sqrt().add_(group['eps'])
-                    p_data_fp32.addcdiv_(-step_size, exp_avg, denom)
+                    p_data_fp32.addcdiv_(exp_avg, denom, value=-step_size)
                 else:
-                    p_data_fp32.add_(-step_size, exp_avg)
+                    p_data_fp32.add_(exp_avg, alpha=-step_size)
 
                 p.data.copy_(p_data_fp32)
 
@@ -129,16 +129,16 @@ class PlainRAdam(Optimizer):
                 N_sma = N_sma_max - 2 * state['step'] * beta2_t / (1 - beta2_t)
 
                 if group['weight_decay'] != 0:
-                    p_data_fp32.add_(-group['weight_decay'] * group['lr'], p_data_fp32)
+                    p_data_fp32.add_(p_data_fp32, alpha=-group['weight_decay'] * group['lr'])
 
                 # more conservative since it's an approximated value
                 if N_sma >= 5:
                     step_size = group['lr'] * math.sqrt((1 - beta2_t) * (N_sma - 4) / (N_sma_max - 4) * (N_sma - 2) / N_sma * N_sma_max / (N_sma_max - 2)) / (1 - beta1 ** state['step'])
                     denom = exp_avg_sq.sqrt().add_(group['eps'])
-                    p_data_fp32.addcdiv_(-step_size, exp_avg, denom)
+                    p_data_fp32.addcdiv_(exp_avg, denom, value=-step_size)
                 else:
                     step_size = group['lr'] / (1 - beta1 ** state['step'])
-                    p_data_fp32.add_(-step_size, exp_avg)
+                    p_data_fp32.add_(exp_avg, alpha=-step_size)
 
                 p.data.copy_(p_data_fp32)
 
@@ -201,7 +201,7 @@ class AdamW(Optimizer):
                 step_size = group['lr'] * math.sqrt(bias_correction2) / bias_correction1
 
                 if group['weight_decay'] != 0:
-                    p_data_fp32.add_(-group['weight_decay'] * scheduled_lr, p_data_fp32)
+                    p_data_fp32.add_(p_data_fp32, alpha=-group['weight_decay'] * scheduled_lr)
 
                 p_data_fp32.addcdiv_(-step_size, exp_avg, denom)
 

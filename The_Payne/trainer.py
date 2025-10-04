@@ -67,10 +67,12 @@ class PayneTrainer:
         # Set device
         if self.use_cuda:
             self.dtype = torch.cuda.FloatTensor
-            torch.set_default_tensor_type('torch.cuda.FloatTensor')
+            torch.set_default_dtype(torch.float32)
+            torch.set_default_device('cuda')
         else:
             self.dtype = torch.FloatTensor
-            torch.set_default_tensor_type('torch.FloatTensor')
+            torch.set_default_dtype(torch.float32)
+            torch.set_default_device('cpu')
         
         # Scale the labels
         self.x_min = np.min(training_labels, axis=0)

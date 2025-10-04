@@ -34,3 +34,4 @@ ENV/
 # Temporary files
 *.log
 *~
+*.npz
