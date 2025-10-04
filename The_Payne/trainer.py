@@ -144,7 +144,14 @@ class PayneTrainer:
         nsamples = x_train.shape[0]
         nbatches = nsamples // batch_size
         nsamples_valid = x_valid.shape[0]
-        nbatches_valid = nsamples_valid // batch_size
+        
+        # Handle case where validation set is smaller than batch size
+        if nsamples_valid < batch_size:
+            batch_size_valid = nsamples_valid
+            nbatches_valid = 1
+        else:
+            batch_size_valid = batch_size
+            nbatches_valid = nsamples_valid // batch_size
         
         current_loss = np.inf
         self.training_loss_history = []
@@ -153,6 +160,8 @@ class PayneTrainer:
         if verbose:
             print(f"Training on {nsamples} spectra, validating on {nsamples_valid} spectra")
             print(f"Batch size: {batch_size}, Number of batches: {nbatches}")
+            if batch_size_valid != batch_size:
+                print(f"Validation batch size adjusted to {batch_size_valid} (validation set smaller than training batch size)")
             print(f"Using device: {'GPU' if self.use_cuda else 'CPU'}")
             print("-" * 70)
         
@@ -181,7 +190,7 @@ class PayneTrainer:
                 
                 loss_valid = 0
                 for j in range(nbatches_valid):
-                    idx = perm_valid[j * batch_size : (j+1) * batch_size]
+                    idx = perm_valid[j * batch_size_valid : (j+1) * batch_size_valid]
                     y_pred_valid = self.model(x_valid[idx])
                     loss_valid += loss_fn(y_pred_valid, y_valid[idx]) * 1e4
                 loss_valid /= nbatches_valid

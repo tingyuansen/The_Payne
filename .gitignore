@@ -2,3 +2,35 @@
 __pycache__/
 *.py[cod]
 *$py.class
+*.so
+
+# Distribution / packaging
+*.egg-info/
+*.egg
+build/
+dist/
+.eggs/
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# macOS
+.DS_Store
+
+# Testing
+.pytest_cache/
+.coverage
+
+# Temporary files
+*.log
+*~

@@ -1,0 +1,51 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "The_Payne"
+version = "1.2.0"
+description = "Tools for interpolating spectral models with neural networks"
+readme = "README.md"
+authors = [
+    {name = "Yuan-Sen Ting", email = "ting@ias.edu"}
+]
+license = {text = "MIT"}
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Astronomy",
+]
+requires-python = ">=3.8"
+dependencies = [
+    "numpy>=1.18.0",
+    "scipy>=1.4.0",
+    "torch>=1.7.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=6.0",
+    "matplotlib>=3.0",
+    "jupyter>=1.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/tingyuansen/The_Payne"
+Repository = "https://github.com/tingyuansen/The_Payne"
+Documentation = "https://github.com/tingyuansen/The_Payne/blob/master/README.md"
+
+[tool.setuptools]
+packages = ["The_Payne"]
+
+[tool.setuptools.package-data]
+The_Payne = ["other_data/*.npz", "neural_nets/*.npz"]
+

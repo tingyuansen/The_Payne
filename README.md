@@ -3,28 +3,44 @@ Tools for interpolating spectral models with neural networks. This package uses 
 
 ## Table of Contents
 - [Installation](#installation)
-- [Key Features](#key-features)
 - [Quick Start](#quick-start)
   - [Use Case 1: Predicting Stellar Spectra](#use-case-1-predicting-stellar-spectra)
   - [Use Case 2: Fitting Observed Spectra](#use-case-2-fitting-observed-spectra)
   - [Use Case 3: Training a New Neural Network](#use-case-3-training-a-new-neural-network)
-- [Testing](#testing)
-- [Stellar Labels](#stellar-labels)
 - [Project Overview](#project-overview)
+- [Stellar Labels](#stellar-labels)
+- [Troubleshooting](#troubleshooting)
+- [Citing this code](#citing-this-code)
 
 ## Installation
-Clone this repository and run code from the base directory:
+
+Clone this repository and install using pip (modern Python packaging):
 ```bash
-python setup.py install
+git clone https://github.com/yourusername/The_Payne.git
+cd The_Payne
+pip install -e .
 ```
+
+For development, install in editable mode (recommended):
+```bash
+pip install -e .
+```
+
+For a standard installation:
+```bash
+pip install .
+```
+
+**Note**: If you previously used `python setup.py install`, please use `pip install .` instead. The old setup.py method is deprecated as of Python 3.12+.
 
 The [tutorial.ipynb](tutorial.ipynb) shows simple use cases for fitting stellar spectra.
 
 ## Dependencies
 * **Spectral model and fitting**: Numpy and Scipy
-* **Training neural networks**: [PyTorch](http://pytorch.org/) (GPU required)
+* **Training neural networks**: [PyTorch](http://pytorch.org/) (GPU required for training, optional for prediction/fitting)
 * All dependencies will be automatically installed with this package
 * Developed in Python 3.7+ using Anaconda
+* Compatible with Python 3.8+
 
 ## Project Overview
 
@@ -109,38 +125,47 @@ scaled_labels = predictor.scale_labels(labels)
 Use **PayneFitter** to determine stellar parameters from observed spectra:
 
 ```python
-from The_Payne import PayneFitter
+from The_Payne import PayneFitter, utils
 import numpy as np
+
+# Load some example data to use as "observed" spectrum
+# (Replace this with your own observed spectrum)
+_, _, valid_labels, valid_spectra = utils.load_training_data()
+observed_spec = valid_spectra[0]  # Use first validation spectrum as example
+
+# Create uncertainty array (adjust based on your data)
+spec_err = np.ones_like(observed_spec) * 0.002  # 0.2% uncertainty
 
 # Initialize the fitter
 fitter = PayneFitter(use_mask=True)  # Uses default APOGEE mask
 print(fitter)  # Shows model info and masked pixel percentage
 
-# Fit your observed spectrum
-# observed_spec: normalized flux array
-# spec_err: uncertainty array (same length as spectrum)
+# Fit the observed spectrum
+print("\nFitting spectrum...")
 fitted_labels, uncertainties, model_spectrum = fitter.fit_spectrum(
     observed_spec, spec_err
 )
 
 # Display results
-print(f"Teff:  {fitted_labels[0]:7.1f} ± {uncertainties[0]:5.1f} K")
-print(f"logg:  {fitted_labels[1]:7.2f} ± {uncertainties[1]:5.2f}")
+print("\nFitted Parameters:")
+print(f"Teff:   {fitted_labels[0]:7.1f} ± {uncertainties[0]:5.1f} K")
+print(f"logg:   {fitted_labels[1]:7.2f} ± {uncertainties[1]:5.2f}")
 print(f"[Fe/H]: {fitted_labels[18]:6.2f} ± {uncertainties[18]:5.2f}")
-print(f"RV:    {fitted_labels[-1]:7.2f} ± {uncertainties[-1]:5.2f} km/s")
+print(f"RV:     {fitted_labels[-1]:7.2f} ± {uncertainties[-1]:5.2f} km/s")
 
 # Evaluate fit quality
 chi2, chi2_reduced, dof = fitter.compute_chi2(
     observed_spec, spec_err, fitted_labels[:-1], fitted_labels[-1]
 )
-print(f"Reduced χ²: {chi2_reduced:.3f}")
+print(f"\nReduced χ²: {chi2_reduced:.3f} (dof = {dof})")
 
 # Get residuals
 residuals = fitter.get_residuals(observed_spec, model_spectrum)
+print(f"RMS residual: {np.sqrt(np.mean(residuals**2)):.6f}")
 
-# Customize masking (e.g., mask a telluric region)
+# Optional: Customize masking (e.g., mask a telluric region)
 fitter.add_mask_region(15890, 15920)  # wavelength in Angstroms
-fitter.reset_mask()  # Reset to default if needed
+# fitter.reset_mask()  # Reset to default if needed
 ```
 
 ### Use Case 3: Training a New Neural Network
@@ -207,6 +232,36 @@ The default model predicts 25 labels:
 - Physical parameters: Teff, log(g), microturbulent velocity
 - Chemical abundances: [C/H], [N/H], [O/H], [Na/H], [Mg/H], [Al/H], [Si/H], [P/H], [S/H], [K/H], [Ca/H], [Ti/H], [V/H], [Cr/H], [Mn/H], [Fe/H], [Co/H], [Ni/H], [Cu/H], [Ge/H]
 - Other: C12/C13, macroturbulent velocity, radial velocity
+
+## Troubleshooting
+
+### Installation Issues
+
+**Problem**: `python setup.py install` shows deprecation warnings
+
+**Solution**: Use `pip install .` or `pip install -e .` instead. The old setup.py method is deprecated in modern Python.
+
+### Training Issues
+
+**Problem**: `ZeroDivisionError` during training when validation set is small
+
+**Solution**: This has been fixed in v1.2.0+. The trainer now automatically adjusts batch size for validation when the validation set is smaller than the training batch size. Update to the latest version.
+
+**Problem**: PyTorch deprecation warnings about `addcmul_` or `add_`
+
+**Solution**: This has been fixed in v1.2.0+. The code now uses the modern PyTorch syntax. Update to the latest version.
+
+### Fitting Issues
+
+**Problem**: "observed_spec not defined" when running fitting examples
+
+**Solution**: The fitting examples now include complete working code that loads validation spectra as example observed data. Copy the complete example from "Use Case 2" above.
+
+### GPU/CUDA Issues
+
+**Problem**: "CUDA requested but not available"
+
+**Solution**: This is just a warning. The code will automatically fall back to CPU. Training on CPU is much slower but will work for small datasets. For production training, use a system with CUDA-compatible GPU.
 
 ## Citing this code
 Please cite [Ting et al. 2019](https://ui.adsabs.harvard.edu/abs/2019ApJ...879...69T/abstract) when using this code. The paper describes the method and its application to APOGEE spectra.
