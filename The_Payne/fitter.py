@@ -29,15 +29,16 @@ class PayneFitter:
         >>> print(f"Teff = {labels[0]:.0f} ± {uncertainties[0]:.0f} K")
     """
     
-    def __init__(self, use_mask=True):
+    def __init__(self, use_mask=True, nn_path=None):
         """
         Initialize the PayneFitter.
         
         Parameters:
             use_mask (bool): Whether to use the default APOGEE mask (default: True)
+            nn_path (str, optional): Path to custom neural network file. If None, uses default.
         """
         # Initialize predictor
-        self.predictor = PaynePredictor()
+        self.predictor = PaynePredictor(nn_path=nn_path)
         
         # Load mask and wavelength
         if use_mask:

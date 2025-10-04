@@ -40,13 +40,32 @@ class PaynePredictor:
             wavelength_path (str, optional): Path to wavelength file. If None, uses default.
         """
         # Load neural network
-        self.NN_coeffs = utils.read_in_neural_network()
+        if nn_path is not None:
+            tmp = np.load(nn_path)
+            w_array_0 = tmp["w_array_0"]
+            w_array_1 = tmp["w_array_1"]
+            w_array_2 = tmp["w_array_2"]
+            b_array_0 = tmp["b_array_0"]
+            b_array_1 = tmp["b_array_1"]
+            b_array_2 = tmp["b_array_2"]
+            x_min = tmp["x_min"]
+            x_max = tmp["x_max"]
+            tmp.close()
+            self.NN_coeffs = (w_array_0, w_array_1, w_array_2, b_array_0, b_array_1, b_array_2, x_min, x_max)
+        else:
+            self.NN_coeffs = utils.read_in_neural_network()
+        
         self.w_array_0, self.w_array_1, self.w_array_2, \
             self.b_array_0, self.b_array_1, self.b_array_2, \
             self.x_min, self.x_max = self.NN_coeffs
         
         # Load wavelength array
-        self.wavelength = utils.load_wavelength_array()
+        if wavelength_path is not None:
+            tmp = np.load(wavelength_path)
+            self.wavelength = tmp['wavelength']
+            tmp.close()
+        else:
+            self.wavelength = utils.load_wavelength_array()
         
         # Store dimensions
         self.num_labels = self.w_array_0.shape[1]

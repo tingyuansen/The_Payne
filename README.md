@@ -96,8 +96,10 @@ Use **PaynePredictor** to generate synthetic spectra from stellar parameters:
 ```python
 from The_Payne import PaynePredictor
 
-# Initialize the predictor
+# Initialize the predictor (uses default pre-trained network)
 predictor = PaynePredictor()
+# Or load your custom network: predictor = PaynePredictor(nn_path="my_network.npz")
+
 print(predictor)  # Shows model info: labels, pixels, wavelength range
 
 # Get default stellar parameters (mid-range values)
@@ -136,8 +138,10 @@ observed_spec = valid_spectra[0]  # Use first validation spectrum as example
 # Create uncertainty array (adjust based on your data)
 spec_err = np.ones_like(observed_spec) * 0.002  # 0.2% uncertainty
 
-# Initialize the fitter
+# Initialize the fitter (uses default pre-trained network)
 fitter = PayneFitter(use_mask=True)  # Uses default APOGEE mask
+# Or load your custom network: fitter = PayneFitter(nn_path="my_network.npz")
+
 print(fitter)  # Shows model info and masked pixel percentage
 
 # Fit the observed spectrum
@@ -215,6 +219,26 @@ plt.legend()
 plt.show()
 ```
 
+**Using Your Custom-Trained Network:**
+
+After training, you can use your custom network for predictions and fitting:
+
+```python
+from The_Payne import PaynePredictor, PayneFitter
+
+# Load your custom-trained network for prediction
+predictor = PaynePredictor(nn_path="my_network.npz")
+labels = predictor.get_default_labels()
+labels[0] = 5000  # Teff
+spectrum = predictor.predict_spectrum(labels)
+
+# Load your custom-trained network for fitting
+fitter = PayneFitter(nn_path="my_network.npz")
+fitted_labels, uncertainties, model_spectrum = fitter.fit_spectrum(
+    observed_spec, spec_err
+)
+```
+
 ### Additional Examples
 
 For complete working examples, see:
@@ -234,28 +258,6 @@ The default model predicts 25 labels:
 - Other: C12/C13, macroturbulent velocity, radial velocity
 
 ## Troubleshooting
-
-### Installation Issues
-
-**Problem**: `python setup.py install` shows deprecation warnings
-
-**Solution**: Use `pip install .` or `pip install -e .` instead. The old setup.py method is deprecated in modern Python.
-
-### Training Issues
-
-**Problem**: `ZeroDivisionError` during training when validation set is small
-
-**Solution**: This has been fixed in v1.2.0+. The trainer now automatically adjusts batch size for validation when the validation set is smaller than the training batch size. Update to the latest version.
-
-**Problem**: PyTorch deprecation warnings about `addcmul_` or `add_`
-
-**Solution**: This has been fixed in v1.2.0+. The code now uses the modern PyTorch syntax. Update to the latest version.
-
-### Fitting Issues
-
-**Problem**: "observed_spec not defined" when running fitting examples
-
-**Solution**: The fitting examples now include complete working code that loads validation spectra as example observed data. Copy the complete example from "Use Case 2" above.
 
 ### GPU/CUDA Issues
 
